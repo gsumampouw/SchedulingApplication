@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="schedulemanager.controllers.AddApptCntrl">
+   <children>
+      <GridPane layoutX="14.0" layoutY="185.0" prefHeight="160.0" prefWidth="326.0">
+        <columnConstraints>
+          <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="107.20001220703125" minWidth="10.0" prefWidth="107.199951171875" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="127.200048828125" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="Title" />
+            <Label text="Description" GridPane.rowIndex="1" />
+            <Label text="Location" GridPane.rowIndex="2" />
+            <Label text="Type" GridPane.rowIndex="3" />
+            <TextField fx:id="titleText" GridPane.columnIndex="1" />
+            <TextField fx:id="descriptionText" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="locationText" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="typeTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+         </children>
+         <padding>
+            <Insets left="20.0" />
+         </padding>
+      </GridPane>
+      <Label layoutX="30.0" layoutY="36.0" text="Add Appointment">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      <Button layoutX="914.0" layoutY="768.0" mnemonicParsing="false" onAction="#cancelButton" text="Cancel" />
+      <Button layoutX="833.0" layoutY="768.0" mnemonicParsing="false" onAction="#saveButton" text="Save" />
+      <Label layoutX="14.0" layoutY="460.0" text="Appointments - Includes All Customers">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Button fx:id="logoutBtn" layoutX="907.0" layoutY="14.0" mnemonicParsing="false" onAction="#logout" text="Logout" />
+      <Label fx:id="usernameLabel" layoutX="791.0" layoutY="18.0" text="Username">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <TabPane layoutX="14.0" layoutY="491.0" prefHeight="219.0" prefWidth="952.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab fx:id="allTab" text="All">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="219.0" prefWidth="937.0">
+                     <children>
+                        <TableView fx:id="allApptTblView" prefHeight="190.0" prefWidth="954.0">
+                          <columns>
+                            <TableColumn fx:id="apptIDClmn" prefWidth="100.0" text="Appointment_ID" />
+                            <TableColumn fx:id="titleClmn" minWidth="4.0" prefWidth="73.60003662109375" text="Title" />
+                              <TableColumn fx:id="descriptionClmn" prefWidth="103.199951171875" text="Description" />
+                              <TableColumn fx:id="locationclmn" minWidth="8.0" prefWidth="75.20001220703125" text="Location" />
+                              <TableColumn fx:id="contactClmn" prefWidth="99.2000732421875" text="Contact" />
+                              <TableColumn fx:id="typeClmn" prefWidth="77.5999755859375" text="Type" />
+                              <TableColumn fx:id="startClmn" prefWidth="122.4000244140625" text="Start Date and Time" />
+                              <TableColumn fx:id="endClmn" prefWidth="116.0001220703125" text="End Date and Time" />
+                              <TableColumn fx:id="customerIdClmn" prefWidth="90.39990234375" text="Customer_ID" />
+                              <TableColumn fx:id="userIdClmn" prefWidth="100.0" text="User_ID" />
+                          </columns>
+                        </TableView>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+            <Tab fx:id="currentMonthTab" text="Current Month">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="219.0" prefWidth="937.0">
+                     <children>
+                        <TableView fx:id="currentMonthTblView" prefHeight="190.0" prefWidth="954.0">
+                           <columns>
+                              <TableColumn fx:id="apptIDClmn1" prefWidth="100.0" text="Appointment_ID" />
+                              <TableColumn fx:id="titleClmn1" minWidth="4.0" prefWidth="73.60003662109375" text="Title" />
+                              <TableColumn fx:id="descriptionClmn1" prefWidth="103.199951171875" text="Description" />
+                              <TableColumn fx:id="locationclmn1" minWidth="8.0" prefWidth="75.20001220703125" text="Location" />
+                              <TableColumn fx:id="contactClmn1" prefWidth="99.2000732421875" text="Contact" />
+                              <TableColumn fx:id="typeClmn1" prefWidth="77.5999755859375" text="Type" />
+                              <TableColumn fx:id="startClmn1" prefWidth="122.4000244140625" text="Start Date and Time" />
+                              <TableColumn fx:id="endClmn1" prefWidth="116.0001220703125" text="End Date and Time" />
+                              <TableColumn fx:id="customerIdClmn1" prefWidth="90.39990234375" text="Customer_ID" />
+                              <TableColumn fx:id="userIdClmn1" prefWidth="100.0" text="User_ID" />
+                           </columns>
+                        </TableView>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab fx:id="currentWeekTab" text="Current Week">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="219.0" prefWidth="937.0">
+                     <children>
+                        <TableView fx:id="currWeekAptTblView" prefHeight="190.0" prefWidth="954.0">
+                           <columns>
+                              <TableColumn fx:id="apptIDClmn2" prefWidth="100.0" text="Appointment_ID" />
+                              <TableColumn fx:id="titleClmn2" minWidth="4.0" prefWidth="73.60003662109375" text="Title" />
+                              <TableColumn fx:id="descriptionClmn2" prefWidth="103.199951171875" text="Description" />
+                              <TableColumn fx:id="locationclmn2" minWidth="8.0" prefWidth="75.20001220703125" text="Location" />
+                              <TableColumn fx:id="contactClmn2" prefWidth="99.2000732421875" text="Contact" />
+                              <TableColumn fx:id="typeClmn2" prefWidth="77.5999755859375" text="Type" />
+                              <TableColumn fx:id="startClmn2" prefWidth="122.4000244140625" text="Start Date and Time" />
+                              <TableColumn fx:id="endClmn2" prefWidth="116.0001220703125" text="End Date and Time" />
+                              <TableColumn fx:id="customerIdClmn2" prefWidth="90.39990234375" text="Customer_ID" />
+                              <TableColumn fx:id="userIdClmn2" prefWidth="100.0" text="User_ID" />
+                           </columns>
+                        </TableView>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+      <DatePicker fx:id="startDatePicker" layoutX="428.0" layoutY="103.0" prefHeight="26.0" prefWidth="133.0" />
+      <Label layoutX="365.0" layoutY="107.0" text="Start Date" />
+      <DatePicker fx:id="endDatePicker" layoutX="639.0" layoutY="103.0" prefHeight="26.0" prefWidth="133.0" />
+      <Label layoutX="576.0" layoutY="107.0" text="End Date" />
+      <Label layoutX="365.0" layoutY="152.0" text="Start Time" />
+      <ComboBox fx:id="startTimeBox" layoutX="428.0" layoutY="148.0" prefHeight="26.0" prefWidth="134.0" />
+      <Label layoutX="576.0" layoutY="151.0" text="End Time" />
+      <ComboBox fx:id="endTimeBox" layoutX="639.0" layoutY="147.0" prefHeight="26.0" prefWidth="134.0" />
+      <Label layoutX="35.0" layoutY="107.0" text="Appointment ID" />
+      <Label layoutX="35.0" layoutY="157.0" text="Customer ID" />
+      <TextField fx:id="customerIdText" editable="false" layoutX="143.0" layoutY="148.0" opacity="0.5" prefHeight="26.0" prefWidth="98.0" />
+      <TextField fx:id="appointmentIdText" editable="false" layoutX="143.0" layoutY="103.0" opacity="0.5" prefHeight="26.0" prefWidth="97.0" text="Auto-Generated" />
+      <Label layoutX="35.0" layoutY="404.0" text="Contact" />
+      <ComboBox fx:id="contactBox" layoutX="143.0" layoutY="400.0" prefWidth="150.0" />
+      <Label layoutX="36.0" layoutY="361.0" text="User ID" />
+      <ComboBox fx:id="userIdComboBox" layoutX="143.0" layoutY="357.0" prefWidth="150.0" />
+   </children>
+</AnchorPane>

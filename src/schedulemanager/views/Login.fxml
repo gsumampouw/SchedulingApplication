@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="schedulemanager.controllers.LoginCntrl">
+   <children>
+      <TextField fx:id="usernameText" layoutX="225.0" layoutY="108.0" />
+      <Label fx:id="usernameLabel" layoutX="225.0" layoutY="85.0" text="Username" />
+      <TextField fx:id="passwordText" layoutX="225.0" layoutY="164.0" />
+      <Label fx:id="passwordLabel" layoutX="225.0" layoutY="141.0" text="Password" />
+      <Button fx:id="loginButton" layoutX="274.0" layoutY="234.0" mnemonicParsing="false" onAction="#login" text="Login" />
+      <Label fx:id="zoneIDLabel" layoutX="36.0" layoutY="25.0" text="ZoneID" />
+   </children>
+</AnchorPane>
