@@ -1,5 +1,8 @@
 package schedulemanager.controllers;
 
+import schedulemanager.database.AppointmentDao;
+import schedulemanager.database.ContactDao;
+import schedulemanager.database.UserDao;
 import schedulemanager.domain.Appointments;
 import schedulemanager.domain.Contacts;
 import schedulemanager.domain.Users;
@@ -12,7 +15,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import schedulemanager.util.alertMsg;
+import schedulemanager.services.Checks;
+import schedulemanager.services.Display;
+import schedulemanager.services.JavaFXFunctions;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,14 +27,16 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ResourceBundle;
 
-import static schedulemanager.database.AppointmentsTable.*;
+import static schedulemanager.database.AppointmentDao.*;
 
 
 public class AddApptCntrl implements Initializable {
 
-
-    Stage stage;
-    Parent scene;
+    JavaFXFunctions navigation = new JavaFXFunctions();
+    JavaFXFunctions alertInfoBox = new JavaFXFunctions();
+    AppointmentDao appointmentDao = new AppointmentDao();
+    ContactDao contactDao = new ContactDao();
+    UserDao userDao = new UserDao();
 
     @FXML
     private TextField appointmentIdText;
@@ -167,7 +174,7 @@ public class AddApptCntrl implements Initializable {
 
     public static int customerId = -1;
 
-    public static void setCustomerIdInAddApptCntrl(int customerId){
+    public static void setCustomerIdInAddApptCntrl(int customerId) {
         AddApptCntrl.customerId = customerId;
     }
 
@@ -180,15 +187,15 @@ public class AddApptCntrl implements Initializable {
         customerIdText.setText(Integer.toString(customerId));
 
         try {
-            contactBox.setItems(schedulemanager.database.ContactsTable.getAllContacts());
-            userIdComboBox.setItems(schedulemanager.database.UserTable.getAllUserId());
+            contactBox.setItems(contactDao.getAllContacts());
+            userIdComboBox.setItems(userDao.getAllUserId());
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
 
-        startTimeBox.setItems(listOfTime());
-        endTimeBox.setItems(listOfTime());
+        startTimeBox.setItems(Display.listOfTime());
+        endTimeBox.setItems(Display.listOfTime());
 
         String appointmentId = "appointmentId";
         String title = "title";
@@ -204,7 +211,7 @@ public class AddApptCntrl implements Initializable {
 
         //populates all tab tableview
         try {
-            allApptTblView.setItems(getAllAppt());
+            allApptTblView.setItems(appointmentDao.getAllAppt());
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -221,7 +228,7 @@ public class AddApptCntrl implements Initializable {
 
         //populates month tab tableview
         try {
-            currentMonthTblView.setItems(getMonthAppt());
+            currentMonthTblView.setItems(appointmentDao.getMonthAppt());
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -238,7 +245,7 @@ public class AddApptCntrl implements Initializable {
 
         //populates week tab tableview
         try {
-            currWeekAptTblView.setItems(getWeekAppt());
+            currWeekAptTblView.setItems(appointmentDao.getWeekAppt());
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -256,44 +263,37 @@ public class AddApptCntrl implements Initializable {
     }
 
     /**
-     *  Navigates to the update customer form.
-     * @param event  activates when the cancel button is clicked
+     * Navigates to the update customer form.
+     *
+     * @param event activates when the cancel button is clicked
      * @throws IOException
      */
     @FXML
     public void cancelButton(ActionEvent event) throws IOException {
-        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/UpdateCustomer.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
+        // TODO: Check SonarLint, probably already mentions this parameter should be a static final variable
+        navigation.navigateToPage(event,"/schedulemanager/views/UpdateCustomer.fxml");
 
     }
 
     /**
      * Returns to login page.
+     *
      * @param event This event is triggered when the logout button is clicked.
      * @throws IOException
      */
     @FXML
     public void logout(ActionEvent event) throws IOException {
-        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Login.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
-
+         navigation.navigateToPage(event,"/schedulemanager/views/Login.fxml");
     }
 
     /**
      * Adds new appointment to database if the appointment start and end is within office hours and does not overlap with other appointments.
-     * There is a lambda function of interface alertMsg that alerts users when the end time is before the start time.
      * @param event This event is triggered when the save button is clicked.
      * @throws IOException
      */
     @FXML
     public void saveButton(ActionEvent event) throws IOException {
-        /*get data from form and check if appointment start and end is within office hours and
-        * does not overlap with other appointments. If so create appointment object.
-        * then update appointment table by passing updated appointment object.*/
+
 
         String title = titleText.getText();
         String description = descriptionText.getText();
@@ -302,56 +302,33 @@ public class AddApptCntrl implements Initializable {
         int customerId = Integer.parseInt(customerIdText.getText());
 
 
-        int contactId  = contactBox.getValue().getContactId();
+        int contactId = contactBox.getValue().getContactId();
         int userId = userIdComboBox.getValue().getUserId();
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
         LocalTime startTime = startTimeBox.getValue();
         LocalTime endTime = endTimeBox.getValue();
 
-        LocalDateTime start = LocalDateTime.of(startDate,startTime);
-        LocalDateTime end = LocalDateTime.of(endDate,endTime);
+        LocalDateTime start = LocalDateTime.of(startDate, startTime);
+        LocalDateTime end = LocalDateTime.of(endDate, endTime);
+        Checks check = new Checks();
+        boolean inOfficeHours = check.checkIfTimeIsInOfficeHrs(start, end);
+        boolean overlapsWithOtherAppts = check.checkIfNewApptOverlapsWithOtherAppts(start, end);
 
-       boolean inOfficeHours = checkIfTimeIsInOfficeHrs(start,end);
-       boolean overlapsWithOtherAppts = checkIfNewApptOverlapsWithOtherAppts(start,end);
+        if (end.isBefore(start)) {
+            String textmsg = "End time is before start time";
+            alertInfoBox.informationAlert("Alert!",null,textmsg);
 
-       //lambda use
-       if(end.isBefore(start)){
-           String textmsg = "End time is before start time";
-           alertMsg msg = (a) -> {
-               Alert alert = new Alert(Alert.AlertType.INFORMATION);
-               alert.setTitle("Alert!");
-               alert.setHeaderText(null);
-               alert.setContentText(a);
-               alert.showAndWait();
-           };
-           msg.showAlert(textmsg);
+        } else if (inOfficeHours && !overlapsWithOtherAppts) {
+           appointmentDao.addAppointment(title, description, location, type, start, end, customerId, userId, contactId);
+            navigation.navigateToPage(event,"/schedulemanager/views/UpdateCustomer.fxml");
 
+        } else if (!inOfficeHours) {
+            alertInfoBox.informationAlert("Appointment is not in office hours",null,"Appointment is not in office hours. Pick a different time.");
 
-       }else if(inOfficeHours && !overlapsWithOtherAppts){
-           addAppointment(title,description,location,type,start,end,customerId,userId,contactId);
-           stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-           scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/UpdateCustomer.fxml"));
-           stage.setScene(new Scene(scene));
-           stage.show();
-
-       } else if (!inOfficeHours){
-
-           Alert alert = new Alert(Alert.AlertType.INFORMATION);
-           alert.setTitle("Appointment is not in office hours");
-           alert.setHeaderText(null);
-           alert.setContentText("Appointment is not in office hours. Pick a different time.");
-
-           alert.showAndWait();
-
-       } else {
-           Alert alert = new Alert(Alert.AlertType.INFORMATION);
-           alert.setTitle("Appointment overlaps with another appointment");
-           alert.setHeaderText(null);
-           alert.setContentText("Appointment overlaps with another appointment. Pick a different time.");
-
-           alert.showAndWait();
-       }
+        } else {
+            alertInfoBox.informationAlert("Appointment overlaps with another appointment",null,"Appointment overlaps with another appointment. Pick a different time.");
+        }
 
     }
 

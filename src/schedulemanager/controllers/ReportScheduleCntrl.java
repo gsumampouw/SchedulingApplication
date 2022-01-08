@@ -9,8 +9,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import schedulemanager.database.AppointmentDao;
+import schedulemanager.database.ContactDao;
 import schedulemanager.domain.Appointments;
 import schedulemanager.domain.Contacts;
+import schedulemanager.services.JavaFXFunctions;
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,13 +21,13 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 public class ReportScheduleCntrl implements Initializable {
-    public Button logoutBtn;
-    Stage stage;
-    Parent scene;
+    JavaFXFunctions navigation = new JavaFXFunctions();
+    AppointmentDao appointmentDao = new AppointmentDao();
+    ContactDao contactDao = new ContactDao();
 
+    public Button logoutBtn;
     @FXML
     private Label usernameLabel;
-
     @FXML
     private TableView<Appointments> scheduleTable;
     @FXML
@@ -44,7 +47,6 @@ public class ReportScheduleCntrl implements Initializable {
     @FXML
     private TableColumn<?,?> customerIdClmn;
 
-
     /**
      * Initializes the contact schedule report page.
      */
@@ -53,12 +55,12 @@ public class ReportScheduleCntrl implements Initializable {
 
         usernameLabel.setText("Username: " + LoginCntrl.logedinUsername);
         try {
-            contactComboBox.setItems(schedulemanager.database.ContactsTable.getAllContacts());
+            contactComboBox.setItems(contactDao.getAllContacts());
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
 
-        scheduleTable.setItems(schedulemanager.database.AppointmentsTable.getApptUsingContactName("All"));
+        scheduleTable.setItems(appointmentDao.getApptUsingContactName("All"));
 
         apptIdClmn.setCellValueFactory(new PropertyValueFactory<>("appointmentId"));
         titleClmn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -77,9 +79,7 @@ public class ReportScheduleCntrl implements Initializable {
      */
     public void contactSelected(ActionEvent actionEvent) {
         String contactName = contactComboBox.getValue().getContactName();
-
-        scheduleTable.setItems(schedulemanager.database.AppointmentsTable.getApptUsingContactName(contactName));
-
+        scheduleTable.setItems(appointmentDao.getApptUsingContactName(contactName));
     }
 
     /**
@@ -88,13 +88,8 @@ public class ReportScheduleCntrl implements Initializable {
      * @throws IOException
      */
     public void logout(ActionEvent actionEvent) throws IOException {
-
-        stage = (Stage) ((Button) actionEvent.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Login.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
+        navigation.navigateToPage(actionEvent,"/schedulemanager/views/Login.fxml");
     }
-
 
     /**
      * Navigates to the home page.
@@ -102,9 +97,6 @@ public class ReportScheduleCntrl implements Initializable {
      * @throws IOException
      */
     public void returnToHome(ActionEvent actionEvent) throws IOException {
-        stage = (Stage) ((Button) actionEvent.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Home.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
+        navigation.navigateToPage(actionEvent,"/schedulemanager/views/Home.fxml");
     }
 }

@@ -2,15 +2,14 @@ package schedulemanager.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
+import schedulemanager.database.AppointmentDao;
+import schedulemanager.database.UserDao;
 import schedulemanager.domain.Appointments;
 import schedulemanager.domain.Users;
+import schedulemanager.services.JavaFXFunctions;
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,11 +17,9 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 public class ReportUserSchedule implements Initializable {
-
-
-
-    Stage stage;
-    Parent scene;
+    JavaFXFunctions navigation = new JavaFXFunctions();
+    AppointmentDao appointmentDao = new AppointmentDao();
+    UserDao userDao = new UserDao();
 
     @FXML
     private Label usernameLabel;
@@ -52,15 +49,14 @@ public class ReportUserSchedule implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         usernameLabel.setText("Username: " + LoginCntrl.logedinUsername);
-        userComboBox.setItems(schedulemanager.database.UserTable.getAllUserId());
+        userComboBox.setItems(userDao.getAllUserId());
         try {
-            userComboBox.setValue(schedulemanager.database.UserTable.getUsersByUserName(LoginCntrl.logedinUsername));
+            userComboBox.setValue(userDao.getUsersByUserName(LoginCntrl.logedinUsername));
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
 
-
-        scheduleTable.setItems(schedulemanager.database.AppointmentsTable.getApptUsingUsername(LoginCntrl.logedinUsername));
+        scheduleTable.setItems(appointmentDao.getApptUsingUsername(LoginCntrl.logedinUsername));
 
         apptIdClmn.setCellValueFactory(new PropertyValueFactory<>("appointmentId"));
         titleClmn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -69,7 +65,6 @@ public class ReportUserSchedule implements Initializable {
         startClmn.setCellValueFactory(new PropertyValueFactory<>("start"));
         endClmn.setCellValueFactory(new PropertyValueFactory<>("end"));
         customerIdClmn.setCellValueFactory(new PropertyValueFactory<>("customerId"));
-
     }
 
     /**
@@ -78,10 +73,7 @@ public class ReportUserSchedule implements Initializable {
      * @throws IOException
      */
     public void logout(ActionEvent actionEvent) throws IOException {
-        stage = (Stage) ((Button) actionEvent.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Login.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
+        navigation.navigateToPage(actionEvent,"/schedulemanager/views/Login.fxml");
     }
 
     /**
@@ -90,8 +82,7 @@ public class ReportUserSchedule implements Initializable {
      */
     public void userSelected(ActionEvent actionEvent) {
         String userName = userComboBox.getValue().getUsername();
-
-        scheduleTable.setItems(schedulemanager.database.AppointmentsTable.getApptUsingUsername(userName));
+        scheduleTable.setItems(appointmentDao.getApptUsingUsername(userName));
     }
 
     /**
@@ -100,9 +91,6 @@ public class ReportUserSchedule implements Initializable {
      * @throws IOException
      */
     public void returnToHome(ActionEvent actionEvent) throws IOException {
-        stage = (Stage) ((Button) actionEvent.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Home.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
+        navigation.navigateToPage(actionEvent,"/schedulemanager/views/Home.fxml");
     }
 }

@@ -1,7 +1,7 @@
 package schedulemanager.controllers;
 
 import schedulemanager.domain.Customers;
-import schedulemanager.database.CustomersTable;
+import schedulemanager.database.CustomerDao;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,21 +11,21 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import schedulemanager.database.DeleteCustomer;
+import schedulemanager.services.Checks;
+import schedulemanager.services.JavaFXFunctions;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-import static schedulemanager.database.AppointmentsTable.checkIfCustomerHasApptUsingCustId;
-import static schedulemanager.database.JDBC.*;
-
 public class HomeCntrl implements Initializable {
-
     Stage stage;
     Parent scene;
+
+    JavaFXFunctions navigation = new JavaFXFunctions();
+    JavaFXFunctions alertInfoBox = new JavaFXFunctions();
+    CustomerDao customerDao = new CustomerDao();
 
     @FXML
     private TableView<Customers> customerTable;
@@ -61,7 +61,7 @@ public class HomeCntrl implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        customerTable.setItems(CustomersTable.getAllCustomers());
+        customerTable.setItems(customerDao.getAllCustomers());
 
         customerIdClmn.setCellValueFactory(new PropertyValueFactory<>("customerId"));
         nameClmn.setCellValueFactory(new PropertyValueFactory<>("customerName"));
@@ -82,12 +82,7 @@ public class HomeCntrl implements Initializable {
      */
     @FXML
     public void addCustomer(ActionEvent event) throws IOException {
-        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/AddCustomer.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
-
-
+        navigation.navigateToPage(event,"/schedulemanager/views/AddCustomer.fxml");
     }
 
     /**
@@ -100,42 +95,16 @@ public class HomeCntrl implements Initializable {
     public void deleteCustomer(ActionEvent event) throws SQLException {
         Customers selectedCustomer = customerTable.getSelectionModel().getSelectedItem();
         int customerId = selectedCustomer.getCustomerId();
-
-        boolean haveAppt = checkIfCustomerHasApptUsingCustId(customerId);
+        Checks check = new Checks();
+        boolean haveAppt = check.checkIfCustomerHasApptUsingCustId(customerId);
 
         if (!haveAppt) {
-
-
-            DeleteCustomer customer = (int Id) -> {
-                String sqlStatement = "DELETE FROM customers WHERE Customer_ID = ?";
-                openConnection();
-
-                PreparedStatement stmnt = connection.prepareStatement(sqlStatement);
-                stmnt.setInt(1, customerId);
-                stmnt.execute();
-
-                closeConnection();
-            };
-            customer.removeCustomer(customerId);
-
-
-            customerTable.setItems(CustomersTable.getAllCustomers());
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Information Dialog");
-            alert.setHeaderText(null);
-            alert.setContentText("Customer was deleted");
-
-            alert.showAndWait();
+            customerDao.deleteCustomer(customerId);
+            customerTable.setItems(customerDao.getAllCustomers());
+            alertInfoBox.informationAlert("Information Dialog",null,"Customer was deleted");
         } else {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Information Dialog");
-            alert.setHeaderText(null);
-            alert.setContentText("All appointments associated with a customer must be deleted prior to customer deletion.");
-
-            alert.showAndWait();
+            alertInfoBox.informationAlert("Information Dialog",null,"All appointments associated with a customer must be deleted prior to customer deletion.");
         }
-
     }
 
     /**
@@ -145,13 +114,7 @@ public class HomeCntrl implements Initializable {
      */
     @FXML
     public void logout(ActionEvent event) throws IOException {
-
-        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Login.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
-
-
+        navigation.navigateToPage(event,"/schedulemanager/views/Login.fxml");
     }
 
 
@@ -167,14 +130,12 @@ public class HomeCntrl implements Initializable {
         if (selectedCustomer != null) {
             stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
             UpdateCustomerCntrl.setSelectedCustomer(selectedCustomer);
-
             scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/UpdateCustomer.fxml"));
             stage.setScene(new Scene(scene));
             stage.show();
-
+        }else{
+            alertInfoBox.informationAlert("No Customer Selected",null, "Select a customer to update.");
         }
-
-
     }
 
     /**
@@ -183,12 +144,7 @@ public class HomeCntrl implements Initializable {
      * @throws IOException
      */
     public void toReportCustomerAppt(ActionEvent actionEvent) throws IOException {
-        stage = (Stage) ((Button) actionEvent.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/ReportCustomerAppt.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
-
-
+        navigation.navigateToPage(actionEvent,"/schedulemanager/views/ReportCustomerAppt.fxml");
     }
 
     /**
@@ -197,10 +153,7 @@ public class HomeCntrl implements Initializable {
      * @throws IOException
      */
     public void toReportContactSchedule(ActionEvent actionEvent) throws IOException {
-        stage = (Stage) ((Button) actionEvent.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/ReportContactSchedule.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
+        navigation.navigateToPage(actionEvent,"/schedulemanager/views/ReportContactSchedule.fxml");
     }
 
     /**
@@ -209,9 +162,6 @@ public class HomeCntrl implements Initializable {
      * @throws IOException
      */
     public void toUserSchedule(ActionEvent actionEvent) throws IOException {
-        stage = (Stage) ((Button) actionEvent.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/ReportUserSchedule.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
+        navigation.navigateToPage(actionEvent,"/schedulemanager/views/ReportUserSchedule.fxml");
     }
 }

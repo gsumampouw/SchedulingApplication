@@ -1,11 +1,12 @@
 package schedulemanager.controllers;
 
+import schedulemanager.database.AppointmentDao;
 import schedulemanager.domain.Appointments;
 import schedulemanager.domain.Countries;
 import schedulemanager.domain.Customers;
-import schedulemanager.database.CountriesTable;
-import schedulemanager.database.CustomersTable;
-import schedulemanager.database.DivisionsTable;
+import schedulemanager.database.CountryDao;
+import schedulemanager.database.CustomerDao;
+import schedulemanager.database.DivisionDao;
 import schedulemanager.domain.Divisions;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -18,6 +19,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import schedulemanager.services.JavaFXFunctions;
 
 import java.io.IOException;
 import java.net.URL;
@@ -26,19 +28,17 @@ import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
 import static schedulemanager.controllers.AddApptCntrl.setCustomerIdInAddApptCntrl;
-import static schedulemanager.database.AppointmentsTable.*;
-import static schedulemanager.database.CountriesTable.getACountry;
-import static schedulemanager.database.DivisionsTable.getADivision;
-import static schedulemanager.database.DivisionsTable.getAssociatedDivisions;
 
 public class UpdateCustomerCntrl implements Initializable {
-
-
     Stage stage;
     Parent scene;
-
+    JavaFXFunctions navigation = new JavaFXFunctions();
+    JavaFXFunctions alertInfoBox = new JavaFXFunctions();
     private static Customers selectedCustomer;
-
+    AppointmentDao appointmentDao = new AppointmentDao();
+    CountryDao countryDao = new CountryDao();
+    CustomerDao customerDao = new CustomerDao();
+    DivisionDao divisionDao = new DivisionDao();
 
     @FXML
     private TextField nameText;
@@ -199,16 +199,16 @@ public class UpdateCustomerCntrl implements Initializable {
         zipText.setText(selectedCustomer.getPostalCode());
         phoneText.setText(selectedCustomer.getPhone());
         addressText.setText(selectedCustomer.getAddress());
-        countryComboBox.setItems(CountriesTable.getAllCountries());
-        divisionBox.setItems(DivisionsTable.getAllDivisions());
-        Divisions customerDiv = getADivision(selectedCustomer.getDivisionId());
-        Countries customerCountry = getACountry(customerDiv.getCountryId());
+        countryComboBox.setItems( countryDao.getAllCountries());
+        divisionBox.setItems(divisionDao.getAllDivisions());
+        Divisions customerDiv = divisionDao.getADivision(selectedCustomer.getDivisionId());
+        Countries customerCountry = countryDao.getACountry(customerDiv.getCountryId());
         countryComboBox.setValue(customerCountry);
         divisionBox.setValue(customerDiv);
 
         //populates all tab tableview
         try {
-            allApptTblView.setItems(getAllAssociatedAppt(selectedCustomer.getCustomerId()));
+            allApptTblView.setItems(appointmentDao.getAllAssociatedAppt(selectedCustomer.getCustomerId()));
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -225,7 +225,7 @@ public class UpdateCustomerCntrl implements Initializable {
 
         //populates month tab tableview
         try {
-            currentMonthTblView.setItems(getMonthAssociatedAppt(selectedCustomer.getCustomerId()));
+            currentMonthTblView.setItems(appointmentDao.getMonthAssociatedAppt(selectedCustomer.getCustomerId()));
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -242,7 +242,7 @@ public class UpdateCustomerCntrl implements Initializable {
 
         //populates week tab tableview
         try {
-            currWeekAptTblView.setItems(getWeekAssociatedAppt(selectedCustomer.getCustomerId()));
+            currWeekAptTblView.setItems(appointmentDao.getWeekAssociatedAppt(selectedCustomer.getCustomerId()));
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -274,14 +274,11 @@ public class UpdateCustomerCntrl implements Initializable {
      */
     @FXML
     public void addApptButton(ActionEvent event) throws IOException {
-
-
         stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
         setCustomerIdInAddApptCntrl(selectedCustomer.getCustomerId());
         scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/AddAppointment.fxml"));
         stage.setScene(new Scene(scene));
         stage.show();
-
     }
 
 
@@ -292,11 +289,7 @@ public class UpdateCustomerCntrl implements Initializable {
      */
     @FXML
     public void cancelButton(ActionEvent event) throws IOException {
-        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Home.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
-
+        navigation.navigateToPage(event,"/schedulemanager/views/Home.fxml");
     }
 
 
@@ -326,31 +319,18 @@ public class UpdateCustomerCntrl implements Initializable {
             e.printStackTrace();
         }
         if (selectedAppt != null) {
-            deleteSelectedApptUsingApptId(selectedAppt.getAppointmentId());
+           appointmentDao.deleteSelectedApptUsingApptId(selectedAppt.getAppointmentId());
 
             try {
-                allApptTblView.setItems(getAllAssociatedAppt(selectedCustomer.getCustomerId()));
+                allApptTblView.setItems(appointmentDao.getAllAssociatedAppt(selectedCustomer.getCustomerId()));
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Information Dialog");
-            alert.setHeaderText(null);
-            alert.setContentText("Appointment was deleted.");
-
-            alert.showAndWait();
+            alertInfoBox.informationAlert("Information Dialog",null,"Appointment was deleted.");
 
         } else {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Information Dialog");
-            alert.setHeaderText(null);
-            alert.setContentText("No appointment was selected.");
-
-            alert.showAndWait();
+            alertInfoBox.informationAlert("Information Dialog",null,"No appointment was selected.");
         }
-
-
     }
 
     /**
@@ -360,7 +340,6 @@ public class UpdateCustomerCntrl implements Initializable {
      */
     @FXML
     public void saveButton(ActionEvent event) throws IOException {
-
         String name = nameText.getText();
         String zip = zipText.getText();
         String phone = phoneText.getText();
@@ -371,34 +350,17 @@ public class UpdateCustomerCntrl implements Initializable {
             int customerId = Integer.parseInt(customerIdText.getText());
 
             if (name.isBlank() || zip.isBlank() || phone.isBlank() || address.isBlank()) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Information Dialog");
-                alert.setHeaderText(null);
-                alert.setContentText("All fields must be completed");
-
-                alert.showAndWait();
+                alertInfoBox.informationAlert("Information Dialog",null,"All fields must be completed");
             } else {
 
                 Customers updatedcustomer = new Customers(customerId, name, address, zip, phone, divId);
-                CustomersTable.updateCustomer(updatedcustomer);
-
-                stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-                scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Home.fxml"));
-                stage.setScene(new Scene(scene));
-                stage.show();
+                customerDao.updateCustomer(updatedcustomer);
+                navigation.navigateToPage(event,"/schedulemanager/views/Home.fxml");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Information Dialog");
-            alert.setHeaderText(null);
-            alert.setContentText("All fields must be completed");
-
-            alert.showAndWait();
-
+            alertInfoBox.informationAlert("Information Dialog",null,"All fields must be completed");
         }
-
-
     }
 
     /**
@@ -432,14 +394,8 @@ public class UpdateCustomerCntrl implements Initializable {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Information Dialog");
-            alert.setHeaderText(null);
-            alert.setContentText("No appointment was selected!");
-
-            alert.showAndWait();
+            alertInfoBox.informationAlert("Information Dialog",null,"No appointment was selected!");
         }
-
     }
 
     /**
@@ -449,23 +405,15 @@ public class UpdateCustomerCntrl implements Initializable {
      */
     @FXML
     public void logout(ActionEvent actionEvent) throws IOException {
-
-        stage = (Stage) ((Button) actionEvent.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Login.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
+        navigation.navigateToPage(actionEvent,"/schedulemanager/views/Login.fxml");
     }
-
-
-    //
 
     /**
      * Function to change division box values based on country id input
      * @param countryId Selected country id from the country combo box.
      */
     private void setDivisionBoxValues(int countryId) {
-
-        ObservableList<Divisions> associatedDiv = getAssociatedDivisions(countryId);
+        ObservableList<Divisions> associatedDiv = divisionDao.getAssociatedDivisions(countryId);
         divisionBox.setItems(associatedDiv);
     }
 
@@ -478,6 +426,4 @@ public class UpdateCustomerCntrl implements Initializable {
         setDivisionBoxValues(countryID);
         divisionBox.setValue(null);
     }
-
-
 }

@@ -1,21 +1,17 @@
 package schedulemanager.controllers;
 
 import schedulemanager.domain.Appointments;
-import schedulemanager.database.UserTable;
+import schedulemanager.database.UserDao;
 import schedulemanager.domain.Users;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-
+import schedulemanager.services.Display;
+import schedulemanager.services.JavaFXFunctions;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,14 +21,12 @@ import java.sql.Timestamp;
 import java.time.*;
 import java.util.ResourceBundle;
 
-import static schedulemanager.database.AppointmentsTable.listApptIn15MinSinceLogIn;
-
 
 public class LoginCntrl implements Initializable {
 
-
-    Stage stage;
-    Parent scene;
+    JavaFXFunctions navigation = new JavaFXFunctions();
+    JavaFXFunctions alertInfoBox = new JavaFXFunctions();
+    UserDao userDao = new UserDao();
 
     @FXML
     private TextField usernameText;
@@ -58,9 +52,7 @@ public class LoginCntrl implements Initializable {
     public static String logedinUsername;
     public static int logedinUserID;
     public static LocalDateTime loginTime;
-    private static int numLoginAttmpt;
-
-
+    private String information_dialog;
     /**
      * Initializes the login page. It checks the computer's language settings and translate the login form to show french or english.
      * To determine the user language settings  I looked at stackoverflow for the solution listed below.
@@ -100,9 +92,9 @@ public class LoginCntrl implements Initializable {
         String password = passwordText.getText();
         Users databaseUser = null;
 
+        information_dialog = "Information Dialog";
         try {
-            databaseUser = UserTable.getUsersByUserName(username);
-
+            databaseUser = userDao.getUsersByUserName(username);
             logedinUsername = databaseUser.getUsername();
             logedinUserID = databaseUser.getUserId();
         } catch (SQLException throwables) {
@@ -110,80 +102,44 @@ public class LoginCntrl implements Initializable {
         } catch (NullPointerException e){
             e.printStackTrace();
             if (userLanguage.equals("fr")) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Information Dialog");
-                alert.setHeaderText("Nom d'utilisateur ou mot de passe incorrect!");
-                alert.setContentText("");
-
-                alert.showAndWait();
+                alertInfoBox.informationAlert(information_dialog,"Nom d'utilisateur ou mot de passe incorrect!",null );
             } else {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Information Dialog");
-                alert.setHeaderText("Wrong username or password!");
-                alert.setContentText("");
+                alertInfoBox.informationAlert(information_dialog,"Wrong username or password!",null );
 
-                alert.showAndWait();
             }
         }
 
         loginTime = LocalDateTime.now();
         Timestamp time = Timestamp.valueOf(loginTime);
-
-        String filename = "src/files/login_activity.txt";
+        String filename = "log\\login_activity.txt";
         String item = "User " + username + " made an unsuccessful login attempt at " +time+ "\n";
-        FileWriter fwriter = new FileWriter(filename, true);
-        PrintWriter outputFile = new PrintWriter(fwriter);
-
 
         if (databaseUser != null && databaseUser.getPassword().equals(password)) {
 
             item = "User " + logedinUsername + " successfully logged in at "  + time+"\n";
-
-            stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-            scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Home.fxml"));
-            stage.setScene(new Scene(scene));
-            stage.show();
-
-            ObservableList<Appointments> listofApptIn15 = listApptIn15MinSinceLogIn(LoginCntrl.loginTime);
+            navigation.navigateToPage(event,"/schedulemanager/views/Home.fxml");
+            Display display = new Display();
+            ObservableList<Appointments> listofApptIn15 = display.listApptIn15MinSinceLogIn(LoginCntrl.loginTime);
 
             if (!listofApptIn15.isEmpty()) {
 
                  String alertMessage = "There is an appointment within 15 minutes!";
 
-
-                for (int i = 0; i < listofApptIn15.size(); i++) {
-                    int apptId = listofApptIn15.get(i).getAppointmentId();
-                    LocalDateTime start = listofApptIn15.get(i).getStart();
+                for (Appointments appointments : listofApptIn15) {
+                    int apptId = appointments.getAppointmentId();
+                    LocalDateTime start = appointments.getStart();
                     LocalDate startDate = start.toLocalDate();
                     LocalTime startTime = start.toLocalTime();
 
                     String appendedMessage = "\n Appointment ID: " + apptId + ", Start Date: " + startDate + ", Start Time: " + startTime;
-                   alertMessage = alertMessage + appendedMessage;
-
-
-
+                    alertMessage = alertMessage + appendedMessage;
                 }
-
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Information Dialog");
-                alert.setHeaderText(null);
-                alert.setContentText(alertMessage);
-
-                alert.showAndWait();
-
+                alertInfoBox.informationAlert(information_dialog,null,alertMessage);
             }
-        } /*else {
-
-
-
-
-        }*/
-
+        }
+        FileWriter fwriter = new FileWriter(filename, true);
+        PrintWriter outputFile = new PrintWriter(fwriter);
         outputFile.print(item);
         outputFile.close();
-
     }
-
-
 }

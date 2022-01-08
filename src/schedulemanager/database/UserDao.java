@@ -12,11 +12,14 @@ import java.sql.Statement;
 
 import static schedulemanager.database.JDBC.*;
 
-public class UserTable {
+public class UserDao {
 
     public static final String USER_ID = "User_ID";
     public static final String USER_NAME = "User_Name";
     public static final String PASSWORD = "Password";
+
+    public UserDao() {
+    }
 
     /**
      * Gets a users object from the database by username.
@@ -24,7 +27,7 @@ public class UserTable {
      * @return Returns a user.
      * @throws SQLException
      */
-    public static Users getUsersByUserName(String userName) throws SQLException {
+    public Users getUsersByUserName(String userName) throws SQLException {
 
         Connection connection = openConnection();
         String sqlStatement = "SELECT * FROM users WHERE User_Name = '" + userName + "' ;";
@@ -34,23 +37,18 @@ public class UserTable {
             Statement stmt = connection.createStatement();
             ResultSet result = stmt.executeQuery(sqlStatement);
 
-
             while (result.next()) {
                 int userId = result.getInt(USER_ID);
                 String username = result.getString(USER_NAME);
                 String password = result.getString(PASSWORD);
 
                 databaseUser = new Users(userId, username, password);
-                System.out.println("username: " + username + " password: " + password);
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }finally {
             closeConnection(connection);
         }
-
-
         return databaseUser;
     }
 
@@ -60,7 +58,7 @@ public class UserTable {
      * @return Returns a user.
      * @throws SQLException
      */
-    public static Users getUsersById(int userId) throws SQLException {
+    public Users getUsersById(int userId) throws SQLException {
 
         Connection connection = openConnection();
         String sqlStatement = "SELECT * FROM users WHERE User_Id = '" + userId + "' ;";
@@ -70,21 +68,16 @@ public class UserTable {
             Statement stmt = connection.createStatement();
             ResultSet result = stmt.executeQuery(sqlStatement);
 
-
             while (result.next()) {
                 String username = result.getString(USER_NAME);
                 String password = result.getString(PASSWORD);
-
                 databaseUser = new Users(userId, username, password);
-                System.out.println("username: " + username + " password: " + password);
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }finally {
             closeConnection(connection);
         }
-
         return databaseUser;
     }
 
@@ -92,7 +85,7 @@ public class UserTable {
      * Gets all users from Users table in the database.
      * @return Returns an observable list of users.
      */
-    public static ObservableList<Users> getAllUserId (){
+    public ObservableList<Users> getAllUserId (){
 
         Connection connection = openConnection();
         String sqlStatement = "SELECT * FROM users ;";
@@ -118,10 +111,7 @@ public class UserTable {
         }finally {
             closeConnection(connection);
         }
-
         return allUserIds;
-
-
     }
 
 

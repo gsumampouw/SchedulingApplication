@@ -9,9 +9,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import schedulemanager.database.AppointmentDao;
+import schedulemanager.database.ContactDao;
+import schedulemanager.database.UserDao;
 import schedulemanager.domain.Appointments;
 import schedulemanager.domain.Contacts;
 import schedulemanager.domain.Users;
+import schedulemanager.services.Checks;
+import schedulemanager.services.Display;
+import schedulemanager.services.JavaFXFunctions;
 
 import java.io.IOException;
 import java.net.URL;
@@ -19,15 +25,12 @@ import java.sql.SQLException;
 import java.time.*;
 import java.util.ResourceBundle;
 
-import static schedulemanager.database.AppointmentsTable.*;
-import static schedulemanager.database.AppointmentsTable.listOfTime;
-import static schedulemanager.database.ContactsTable.getAContact;
-import static schedulemanager.database.UserTable.getUsersById;
-
 public class UpdateApptCntrl implements Initializable {
-
-    Stage stage;
-    Parent scene;
+    JavaFXFunctions navigation = new JavaFXFunctions();
+    JavaFXFunctions alertInfoBox = new JavaFXFunctions();
+    AppointmentDao appointmentDao = new AppointmentDao();
+    ContactDao contactDao = new ContactDao();
+    UserDao userDao = new UserDao();
 
     @FXML
     private TextField titleText;
@@ -189,10 +192,10 @@ public class UpdateApptCntrl implements Initializable {
         customerIdText.setText(Integer.toString(selectedAppt.getCustomerId()));
         appointmentIdText.setText(Integer.toString(selectedAppt.getAppointmentId()));
         try {
-            contactBox.setItems(schedulemanager.database.ContactsTable.getAllContacts());
-            contactBox.setValue(getAContact(selectedAppt.getContactId()));
-            userIdComboBox.setItems(schedulemanager.database.UserTable.getAllUserId());
-            userIdComboBox.setValue(getUsersById(selectedAppt.getUserId()));
+            contactBox.setItems(contactDao.getAllContacts());
+            contactBox.setValue(contactDao.getAContact(selectedAppt.getContactId()));
+            userIdComboBox.setItems(userDao.getAllUserId());
+            userIdComboBox.setValue(userDao.getUsersById(selectedAppt.getUserId()));
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -201,9 +204,9 @@ public class UpdateApptCntrl implements Initializable {
         startDatePicker.setValue(selectedAppt.getStart().toLocalDate());
         endDatePicker.setValue(selectedAppt.getEnd().toLocalDate());
 
-        startTimeBox.setItems(listOfTime());
+        startTimeBox.setItems(Display.listOfTime());
         startTimeBox.setValue(selectedAppt.getStart().toLocalTime());
-        endTimeBox.setItems(listOfTime());
+        endTimeBox.setItems(Display.listOfTime());
         endTimeBox.setValue(selectedAppt.getEnd().toLocalTime());
 
         String appointmentId = "appointmentId";
@@ -219,7 +222,7 @@ public class UpdateApptCntrl implements Initializable {
 
         //populates all tab tableview
         try {
-            allApptTblView.setItems(getAllAppt());
+            allApptTblView.setItems(appointmentDao.getAllAppt());
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -236,7 +239,7 @@ public class UpdateApptCntrl implements Initializable {
 
         //populates month tab tableview
         try {
-            currentMonthTblView.setItems(getMonthAppt());
+            currentMonthTblView.setItems(appointmentDao.getMonthAppt());
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -253,7 +256,7 @@ public class UpdateApptCntrl implements Initializable {
 
         //populates week tab tableview
         try {
-            currWeekAptTblView.setItems(getWeekAppt());
+            currWeekAptTblView.setItems(appointmentDao.getWeekAppt());
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -277,12 +280,7 @@ public class UpdateApptCntrl implements Initializable {
      */
     @FXML
     public void cancelButton(ActionEvent event) throws IOException {
-        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/UpdateCustomer.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
-
-
+        navigation.navigateToPage(event,"/schedulemanager/views/UpdateCustomer.fxml");
     }
 
     /**
@@ -292,11 +290,7 @@ public class UpdateApptCntrl implements Initializable {
      */
     @FXML
     public void logout(ActionEvent event) throws IOException {
-        stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Login.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
-
+        navigation.navigateToPage(event,"/schedulemanager/views/Login.fxml");
     }
 
     /**
@@ -329,43 +323,20 @@ public class UpdateApptCntrl implements Initializable {
         LocalDateTime start = LocalDateTime.of(startDate,startTime);
         LocalDateTime end = LocalDateTime.of(endDate,endTime);
 
-       boolean inOfficeHours = checkIfTimeIsInOfficeHrs(start,end);
-       boolean overlapsWithOtherAppts = checkIfUpdatedApptOverlapsWithOtherAppts(start,end,appointmentId);
+        Checks check = new Checks();
+       boolean inOfficeHours = check.checkIfTimeIsInOfficeHrs(start,end);
+       boolean overlapsWithOtherAppts = check.checkIfUpdatedApptOverlapsWithOtherAppts(start,end,appointmentId);
 
        if(end.isBefore(start)){
-           Alert alert = new Alert(Alert.AlertType.INFORMATION);
-           alert.setTitle("Alert!");
-           alert.setHeaderText(null);
-           alert.setContentText("End time is before start time");
-
-           alert.showAndWait();
+           alertInfoBox.informationAlert("Alert!",null,"End time is before start time.");
        }else if(inOfficeHours && !overlapsWithOtherAppts){
            Appointments updatedAppt = new Appointments(appointmentId,title,description,location,type,start,end,customerId,userId,contactId);
-           updateAppointment(updatedAppt);
-
-           stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-           scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/UpdateCustomer.fxml"));
-           stage.setScene(new Scene(scene));
-           stage.show();
-
+          appointmentDao.updateAppointment(updatedAppt);
+           navigation.navigateToPage(event,"/schedulemanager/views/UpdateCustomer.fxml");
        } else if (!inOfficeHours){
-
-           Alert alert = new Alert(Alert.AlertType.INFORMATION);
-           alert.setTitle("Appointment is not in office hours");
-           alert.setHeaderText(null);
-           alert.setContentText("Appointment is not in office hours. Pick a different time.");
-
-           alert.showAndWait();
-
+           alertInfoBox.informationAlert("Appointment is not in office hours",null,"Appointment is not in office hours. Pick a different time.");
        } else {
-           Alert alert = new Alert(Alert.AlertType.INFORMATION);
-           alert.setTitle("Appointment overlaps with another appointment");
-           alert.setHeaderText(null);
-           alert.setContentText("Appointment overlaps with another appointment. Pick a different time.");
-
-           alert.showAndWait();
+           alertInfoBox.informationAlert("Appointment overlaps with another appointment",null,"Appointment overlaps with another appointment. Pick a different time.");
        }
-
     }
-
 }

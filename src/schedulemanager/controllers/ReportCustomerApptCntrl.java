@@ -11,21 +11,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import schedulemanager.database.AppointmentDao;
 import schedulemanager.domain.TotalApptbyMonth;
+import schedulemanager.services.JavaFXFunctions;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import static schedulemanager.database.AppointmentsTable.getTotalApptByMonth;
-
-
 public class ReportCustomerApptCntrl implements Initializable {
-
-
-    Stage stage;
-    Parent scene;
-
+    JavaFXFunctions navigation = new JavaFXFunctions();
+    AppointmentDao appointmentDao = new AppointmentDao();
 
     @FXML
     private Label usernameLabel;
@@ -49,11 +45,11 @@ public class ReportCustomerApptCntrl implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        ObservableList<String> listOfType = schedulemanager.database.AppointmentsTable.getListOfTypeOfAppts();
+        ObservableList<String> listOfType = appointmentDao.getListOfTypeOfAppts();
         usernameLabel.setText("Username: " + LoginCntrl.logedinUsername);
         typeComboBox.setItems(listOfType);
         typeComboBox.setValue("All Types");
-        monthTotalApptTable.setItems(getTotalApptByMonth("All Types"));
+        monthTotalApptTable.setItems(appointmentDao.getTotalApptByMonth("All Types"));
         monthClmn.setCellValueFactory(new PropertyValueFactory<>("month"));
         totalApptClmn.setCellValueFactory(new PropertyValueFactory<>("total"));
 
@@ -66,12 +62,7 @@ public class ReportCustomerApptCntrl implements Initializable {
      * @throws IOException
      */
     public void logout(ActionEvent actionEvent) throws IOException {
-
-        stage = (Stage) ((Button) actionEvent.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Login.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
-
+        navigation.navigateToPage(actionEvent,"/schedulemanager/views/Login.fxml");
     }
 
     /**
@@ -79,13 +70,9 @@ public class ReportCustomerApptCntrl implements Initializable {
      * @param actionEvent This event is trigggered when a type is selected from the combo box.
      */
     public void typeSelected(ActionEvent actionEvent) {
-
        String type =  typeComboBox.getValue();
-
-
-       ObservableList<TotalApptbyMonth> listTotalApptByMonth =  getTotalApptByMonth(type);
+       ObservableList<TotalApptbyMonth> listTotalApptByMonth =  appointmentDao.getTotalApptByMonth(type);
        monthTotalApptTable.setItems(listTotalApptByMonth);
-
     }
 
     /**
@@ -94,10 +81,6 @@ public class ReportCustomerApptCntrl implements Initializable {
      * @throws IOException
      */
     public void returnToHomePage(ActionEvent actionEvent) throws IOException {
-
-        stage = (Stage) ((Button) actionEvent.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/schedulemanager/views/Home.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
+        navigation.navigateToPage(actionEvent,"/schedulemanager/views/Home.fxml");
     }
 }

@@ -2,7 +2,9 @@ package schedulemanager.domain;
 
 import java.time.LocalDateTime;
 
-/** This class creates appointment objects.*/
+/**
+ * This class creates appointment objects.
+ */
 public class Appointments {
     private int appointmentId;
     private String title;
@@ -17,16 +19,17 @@ public class Appointments {
 
     /**
      * This is a contructor for the appointment class.
+     *
      * @param appointmentId - Sets appointmentId.
-     * @param title - Sets title.
-     * @param description - Sets description.
-     * @param location - Sets location.
-     * @param type - Sets type.
-     * @param start - Sets start.
-     * @param end - Sets end.
-     * @param customerId - Sets customerId.
-     * @param userId - Sets userId.
-     * @param contactId - Sets contactId.
+     * @param title         - Sets title.
+     * @param description   - Sets description.
+     * @param location      - Sets location.
+     * @param type          - Sets type.
+     * @param start         - Sets start.
+     * @param end           - Sets end.
+     * @param customerId    - Sets customerId.
+     * @param userId        - Sets userId.
+     * @param contactId     - Sets contactId.
      */
     public Appointments(int appointmentId, String title, String description, String location, String type, LocalDateTime start, LocalDateTime end, int customerId, int userId, int contactId) {
         this.appointmentId = appointmentId;
@@ -42,7 +45,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @return The appointmentId.
      */
     public int getAppointmentId() {
@@ -50,7 +52,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @param appointmentId - Sets appointmentId.
      */
     public void setAppointmentId(int appointmentId) {
@@ -58,7 +59,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @return The Title.
      */
     public String getTitle() {
@@ -66,7 +66,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @param title - Sets title.
      */
     public void setTitle(String title) {
@@ -74,7 +73,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @return The description.
      */
     public String getDescription() {
@@ -82,7 +80,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @param description - Sets description.
      */
     public void setDescription(String description) {
@@ -90,7 +87,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @return The location.
      */
     public String getLocation() {
@@ -98,7 +94,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @param location - Sets location.
      */
     public void setLocation(String location) {
@@ -106,7 +101,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @return The type.
      */
     public String getType() {
@@ -114,7 +108,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @param type - Sets type.
      */
     public void setType(String type) {
@@ -122,7 +115,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @return The start.
      */
     public LocalDateTime getStart() {
@@ -130,7 +122,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @param start - Sets start.
      */
     public void setStart(LocalDateTime start) {
@@ -138,7 +129,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @return The end.
      */
     public LocalDateTime getEnd() {
@@ -146,7 +136,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @param end - Sets end.
      */
     public void setEnd(LocalDateTime end) {
@@ -154,7 +143,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @return The customerId.
      */
     public int getCustomerId() {
@@ -162,7 +150,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @param customerId - Sets customerId.
      */
     public void setCustomerId(int customerId) {
@@ -170,7 +157,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @return The userId.
      */
     public int getUserId() {
@@ -178,7 +164,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @param userId - Sets userId.
      */
     public void setUserId(int userId) {
@@ -186,7 +171,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @return The contactId.
      */
     public int getContactId() {
@@ -194,7 +178,6 @@ public class Appointments {
     }
 
     /**
-     *
      * @param contactId - Sets contactId.
      */
     public void setContactId(int contactId) {
