@@ -4,6 +4,7 @@ import schedulemanager.domain.Contacts;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,7 +20,7 @@ public class ContactsTable {
      */
     public static ObservableList<Contacts> getAllContacts() throws SQLException {
         ObservableList<Contacts> allContacts = FXCollections.observableArrayList();
-        openConnection();
+        Connection connection = openConnection();
 
         String sqlStatement = "select * from contacts;";
 
@@ -45,7 +46,7 @@ public class ContactsTable {
     public static Contacts getAContact(int contactId){
         Contacts aContact = null;
 
-        openConnection();
+        Connection connection = openConnection();
 
         String sqlStatement = "select * from contacts where contact_id = "+contactId+";";
         try {

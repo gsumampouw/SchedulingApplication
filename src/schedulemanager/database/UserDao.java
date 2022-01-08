@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,6 +13,10 @@ import java.sql.Statement;
 import static schedulemanager.database.JDBC.*;
 
 public class UserTable {
+
+    public static final String USER_ID = "User_ID";
+    public static final String USER_NAME = "User_Name";
+    public static final String PASSWORD = "Password";
 
     /**
      * Gets a users object from the database by username.
@@ -21,7 +26,7 @@ public class UserTable {
      */
     public static Users getUsersByUserName(String userName) throws SQLException {
 
-        openConnection();
+        Connection connection = openConnection();
         String sqlStatement = "SELECT * FROM users WHERE User_Name = '" + userName + "' ;";
         Users databaseUser = null;
 
@@ -31,9 +36,9 @@ public class UserTable {
 
 
             while (result.next()) {
-                int userId = result.getInt("User_ID");
-                String username = result.getString("User_Name");
-                String password = result.getString("Password");
+                int userId = result.getInt(USER_ID);
+                String username = result.getString(USER_NAME);
+                String password = result.getString(PASSWORD);
 
                 databaseUser = new Users(userId, username, password);
                 System.out.println("username: " + username + " password: " + password);
@@ -41,8 +46,10 @@ public class UserTable {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+            closeConnection(connection);
         }
-        closeConnection();
+
 
         return databaseUser;
     }
@@ -55,7 +62,7 @@ public class UserTable {
      */
     public static Users getUsersById(int userId) throws SQLException {
 
-        openConnection();
+        Connection connection = openConnection();
         String sqlStatement = "SELECT * FROM users WHERE User_Id = '" + userId + "' ;";
         Users databaseUser = null;
 
@@ -65,8 +72,8 @@ public class UserTable {
 
 
             while (result.next()) {
-                String username = result.getString("User_Name");
-                String password = result.getString("Password");
+                String username = result.getString(USER_NAME);
+                String password = result.getString(PASSWORD);
 
                 databaseUser = new Users(userId, username, password);
                 System.out.println("username: " + username + " password: " + password);
@@ -74,8 +81,9 @@ public class UserTable {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+            closeConnection(connection);
         }
-        closeConnection();
 
         return databaseUser;
     }
@@ -86,7 +94,7 @@ public class UserTable {
      */
     public static ObservableList<Users> getAllUserId (){
 
-        openConnection();
+        Connection connection = openConnection();
         String sqlStatement = "SELECT * FROM users ;";
         Users databaseUser = null;
         ObservableList<Users> allUserIds = FXCollections.observableArrayList();
@@ -97,9 +105,9 @@ public class UserTable {
 
 
             while (result.next()) {
-                int userId = result.getInt("User_ID");
-                String username = result.getString("User_Name");
-                String password = result.getString("Password");
+                int userId = result.getInt(USER_ID);
+                String username = result.getString(USER_NAME);
+                String password = result.getString(PASSWORD);
 
                 databaseUser = new Users(userId, username, password);
                 allUserIds.add(databaseUser);
@@ -107,8 +115,9 @@ public class UserTable {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+            closeConnection(connection);
         }
-        closeConnection();
 
         return allUserIds;
 

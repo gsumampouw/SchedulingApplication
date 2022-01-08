@@ -4,10 +4,7 @@ import schedulemanager.domain.Customers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 import static schedulemanager.database.JDBC.*;
 
@@ -20,7 +17,7 @@ public class CustomersTable {
      */
     public static ObservableList<Customers> getAllCustomers() {
 
-        openConnection();
+        Connection connection = openConnection();
         String sqlStatement = "SELECT * FROM customers ;";
         ObservableList<Customers> allCustomers = FXCollections.observableArrayList();
 
@@ -42,17 +39,15 @@ public class CustomersTable {
                 Customers customerDatabase = new Customers(customerId, name, address, postalCode, phone, divisionId);
                 allCustomers.add(customerDatabase);
 
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
             e.printStackTrace();
+        }finally {
+            closeConnection(connection);
         }
-
-        closeConnection();
         return allCustomers;
-
 
     }
 
@@ -67,7 +62,7 @@ public class CustomersTable {
      */
     public static void addCustomer(String customerName,String address,String postalCode,String phone,int divisionid) throws SQLException {
         //add customerData to database
-        openConnection();
+        Connection connection = openConnection();
 
         String sqlStatement = "INSERT INTO customers(customer_name,address,postal_code,phone,division_id) " +
                 "values(?,?,?,?,?)";
@@ -81,10 +76,10 @@ public class CustomersTable {
             stmnt.setInt(5,divisionid);
             stmnt.executeUpdate();
 
-
-
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            closeConnection(connection);
         }
 
     }
@@ -95,7 +90,7 @@ public class CustomersTable {
      * @param updatedCust Updated customer object containing updated information.
      */
     public static void updateCustomer(Customers updatedCust) {
-        openConnection();
+       Connection connection = openConnection();
 
         int customerId = updatedCust.getCustomerId();
         String name = updatedCust.getCustomerName();
@@ -113,13 +108,29 @@ public class CustomersTable {
             System.out.println("Customers updated: " + count);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        }finally {
+            closeConnection(connection);
         }
-
-        closeConnection();
 
     }
 
+public static void deleteCustomer(int customerId){
 
+        String sqlStatement = "DELETE FROM customers WHERE Customer_ID = ?";
+       Connection connection = openConnection();
+try {
+    PreparedStatement stmnt = connection.prepareStatement(sqlStatement);
+    stmnt.setInt(1, customerId);
+    stmnt.execute();
+}catch (SQLException e){
+    e.printStackTrace();
+}finally {
+    closeConnection(connection);
+}
+
+
+
+}
 }
 
 

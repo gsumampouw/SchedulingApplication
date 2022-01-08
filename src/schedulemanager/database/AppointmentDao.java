@@ -10,7 +10,20 @@ import java.time.*;
 
 import static schedulemanager.database.JDBC.*;
 
-public class AppointmentsTable {
+// TODO: Refactor all database package classes to match DAO naming convention e.g.. AppointmentsDao
+public abstract class AppointmentsTable {
+
+    public static final String DESCRIPTION = "description";
+    public static final String APPOINTMENT_ID = "appointment_id";
+    public static final String TITLE = "title";
+    public static final String LOCATION = "location";
+    public static final String TYPE = "type";
+    public static final String START = "start";
+    public static final String END = "end";
+    public static final String USER_ID = "user_id";
+    public static final String CONTACT_ID = "contact_Id";
+    public static final String CUSTOMER_ID = "customer_Id";
+    public static final String SELECT_FROM_APPOINTMENTS_WHERE_CUSTOMER_ID = "SELECT * FROM appointments WHERE Customer_ID = ";
 
     /**
      * Gets all associated appointments based on the customer ID.
@@ -20,26 +33,26 @@ public class AppointmentsTable {
      */
     public static ObservableList<Appointments> getAllAssociatedAppt(int customerId) throws SQLException {
         ObservableList<Appointments> allAssociatedAppt = FXCollections.observableArrayList();
-        openConnection();
+        Connection connection = openConnection();
 
-        Statement stmnt = null;
-        String sqlStatement = "SELECT * FROM appointments WHERE Customer_ID = " + customerId + ";";
+        Statement stmnt;
+        String sqlStatement = SELECT_FROM_APPOINTMENTS_WHERE_CUSTOMER_ID + customerId + ";";
         try {
             stmnt = connection.createStatement();
             ResultSet result = stmnt.executeQuery(sqlStatement);
 
             while (result.next()) {
-                int appointmentId = result.getInt("appointment_id");
-                String title = result.getString("title");
-                String description = result.getString("description");
-                String location = result.getString("location");
-                String type = result.getString("type");
-                Timestamp timeStampStart = result.getTimestamp("start");
+                int appointmentId = result.getInt(APPOINTMENT_ID);
+                String title = result.getString(TITLE);
+                String description = result.getString(DESCRIPTION);
+                String location = result.getString(LOCATION);
+                String type = result.getString(TYPE);
+                Timestamp timeStampStart = result.getTimestamp(START);
                 LocalDateTime start = timeStampStart.toLocalDateTime();
-                Timestamp timeStampEnd = result.getTimestamp("end");
+                Timestamp timeStampEnd = result.getTimestamp(END);
                 LocalDateTime end = timeStampEnd.toLocalDateTime();
-                int userId = result.getInt("user_id");
-                int contactId = result.getInt("contact_Id");
+                int userId = result.getInt(USER_ID);
+                int contactId = result.getInt(CONTACT_ID);
 
                 Appointments appt = new Appointments(appointmentId, title, description, location, type, start, end, customerId, userId, contactId);
                 allAssociatedAppt.add(appt);
@@ -48,7 +61,7 @@ public class AppointmentsTable {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-            closeConnection();
+            closeConnection(connection);
         }
         return allAssociatedAppt;
 
@@ -63,26 +76,26 @@ public class AppointmentsTable {
      */
     public static ObservableList<Appointments> getMonthAssociatedAppt(int customerId) throws SQLException {
         ObservableList<Appointments> allAssociatedAppt = FXCollections.observableArrayList();
+        Connection connection = openConnection();
 
-        openConnection();
 
-        String sqlStatement = "SELECT * FROM appointments WHERE Customer_ID = " + customerId + " AND start between now() and date_add(now(), interval 1 month);";
+        String sqlStatement = SELECT_FROM_APPOINTMENTS_WHERE_CUSTOMER_ID + customerId + " AND start between now() and date_add(now(), interval 1 month);";
         try {
             Statement stmnt = connection.createStatement();
             ResultSet result = stmnt.executeQuery(sqlStatement);
 
             while (result.next()) {
-                int appointmentId = result.getInt("appointment_id");
-                String title = result.getString("title");
-                String description = result.getString("description");
-                String location = result.getString("location");
-                String type = result.getString("type");
-                Timestamp timeStampStart = result.getTimestamp("start");
+                int appointmentId = result.getInt(APPOINTMENT_ID);
+                String title = result.getString(TITLE);
+                String description = result.getString(DESCRIPTION);
+                String location = result.getString(LOCATION);
+                String type = result.getString(TYPE);
+                Timestamp timeStampStart = result.getTimestamp(START);
                 LocalDateTime start = timeStampStart.toLocalDateTime();
-                Timestamp timeStampEnd = result.getTimestamp("end");
+                Timestamp timeStampEnd = result.getTimestamp(END);
                 LocalDateTime end = timeStampEnd.toLocalDateTime();
-                int userId = result.getInt("user_id");
-                int contactId = result.getInt("contact_Id");
+                int userId = result.getInt(USER_ID);
+                int contactId = result.getInt(CONTACT_ID);
 
                 Appointments appt = new Appointments(appointmentId, title, description, location, type, start, end, customerId, userId, contactId);
                 allAssociatedAppt.add(appt);
@@ -92,7 +105,7 @@ public class AppointmentsTable {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-            closeConnection();
+            closeConnection(connection);
         }
         return allAssociatedAppt;
     }
@@ -106,25 +119,25 @@ public class AppointmentsTable {
     public static ObservableList<Appointments> getWeekAssociatedAppt(int customerId) throws SQLException {
         ObservableList<Appointments> allAssociatedAppt = FXCollections.observableArrayList();
         Statement stmnt = null;
-        openConnection();
+        Connection connection = openConnection();
 
-        String sqlStatement = "SELECT * FROM appointments WHERE Customer_ID = " + customerId + " AND start between now() and date_add(now(), interval 1 week);";
+        String sqlStatement = SELECT_FROM_APPOINTMENTS_WHERE_CUSTOMER_ID + customerId + " AND start between now() and date_add(now(), interval 1 week);";
         try {
             stmnt = connection.createStatement();
             ResultSet result = stmnt.executeQuery(sqlStatement);
 
             while (result.next()) {
-                int appointmentId = result.getInt("appointment_id");
-                String title = result.getString("title");
-                String description = result.getString("description");
-                String location = result.getString("location");
-                String type = result.getString("type");
-                Timestamp timeStampStart = result.getTimestamp("start");
+                int appointmentId = result.getInt(APPOINTMENT_ID);
+                String title = result.getString(TITLE);
+                String description = result.getString(DESCRIPTION);
+                String location = result.getString(LOCATION);
+                String type = result.getString(TYPE);
+                Timestamp timeStampStart = result.getTimestamp(START);
                 LocalDateTime start = timeStampStart.toLocalDateTime();
-                Timestamp timeStampEnd = result.getTimestamp("end");
+                Timestamp timeStampEnd = result.getTimestamp(END);
                 LocalDateTime end = timeStampEnd.toLocalDateTime();
-                int userId = result.getInt("user_id");
-                int contactId = result.getInt("contact_Id");
+                int userId = result.getInt(USER_ID);
+                int contactId = result.getInt(CONTACT_ID);
 
                 Appointments appt = new Appointments(appointmentId, title, description, location, type, start, end, customerId, userId, contactId);
                 allAssociatedAppt.add(appt);
@@ -132,8 +145,7 @@ public class AppointmentsTable {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-            stmnt.close();
-            closeConnection();
+            closeConnection(connection);
         }
         return allAssociatedAppt;
 
@@ -149,7 +161,7 @@ public class AppointmentsTable {
 
         ObservableList<Appointments> allAppt = FXCollections.observableArrayList();
         Statement stmnt = null;
-        openConnection();
+        Connection connection = openConnection();
 
         String sqlStatement = "SELECT * FROM appointments;";
         try {
@@ -157,18 +169,18 @@ public class AppointmentsTable {
             ResultSet result = stmnt.executeQuery(sqlStatement);
 
             while (result.next()) {
-                int customerId = result.getInt("customer_Id");
-                int appointmentId = result.getInt("appointment_id");
-                String title = result.getString("title");
-                String description = result.getString("description");
-                String location = result.getString("location");
-                String type = result.getString("type");
-                Timestamp timeStampStart = result.getTimestamp("start");
+                int customerId = result.getInt(CUSTOMER_ID);
+                int appointmentId = result.getInt(APPOINTMENT_ID);
+                String title = result.getString(TITLE);
+                String description = result.getString(DESCRIPTION);
+                String location = result.getString(LOCATION);
+                String type = result.getString(TYPE);
+                Timestamp timeStampStart = result.getTimestamp(START);
                 LocalDateTime start = timeStampStart.toLocalDateTime();
-                Timestamp timeStampEnd = result.getTimestamp("end");
+                Timestamp timeStampEnd = result.getTimestamp(END);
                 LocalDateTime end = timeStampEnd.toLocalDateTime();
-                int userId = result.getInt("user_id");
-                int contactId = result.getInt("contact_Id");
+                int userId = result.getInt(USER_ID);
+                int contactId = result.getInt(CONTACT_ID);
 
                 Appointments appt = new Appointments(appointmentId, title, description, location, type, start, end, customerId, userId, contactId);
                 allAppt.add(appt);
@@ -176,10 +188,11 @@ public class AppointmentsTable {
             }
 
         } catch (SQLException throwables) {
+            // TODO: Exception handling guide:
             throwables.printStackTrace();
         } finally {
             stmnt.close();
-            closeConnection();
+            closeConnection(connection);
         }
         return allAppt;
 
@@ -194,7 +207,7 @@ public class AppointmentsTable {
 
         ObservableList<Appointments> monthAppt = FXCollections.observableArrayList();
         Statement stmnt = null;
-        openConnection();
+        Connection connection = openConnection();
 
         String sqlStatement = "SELECT * FROM appointments WHERE start between now() and date_add(now(), interval 1 month);";
         try {
@@ -202,18 +215,18 @@ public class AppointmentsTable {
             ResultSet result = stmnt.executeQuery(sqlStatement);
 
             while (result.next()) {
-                int customerId = result.getInt("customer_Id");
-                int appointmentId = result.getInt("appointment_id");
-                String title = result.getString("title");
-                String description = result.getString("description");
-                String location = result.getString("location");
-                String type = result.getString("type");
-                Timestamp timeStampStart = result.getTimestamp("start");
+                int customerId = result.getInt(CUSTOMER_ID);
+                int appointmentId = result.getInt(APPOINTMENT_ID);
+                String title = result.getString(TITLE);
+                String description = result.getString(DESCRIPTION);
+                String location = result.getString(LOCATION);
+                String type = result.getString(TYPE);
+                Timestamp timeStampStart = result.getTimestamp(START);
                 LocalDateTime start = timeStampStart.toLocalDateTime();
-                Timestamp timeStampEnd = result.getTimestamp("end");
+                Timestamp timeStampEnd = result.getTimestamp(END);
                 LocalDateTime end = timeStampEnd.toLocalDateTime();
-                int userId = result.getInt("user_id");
-                int contactId = result.getInt("contact_Id");
+                int userId = result.getInt(USER_ID);
+                int contactId = result.getInt(CONTACT_ID);
 
 
                 Appointments appt = new Appointments(appointmentId, title, description, location, type, start, end, customerId, userId, contactId);
@@ -225,7 +238,7 @@ public class AppointmentsTable {
             throwables.printStackTrace();
         } finally {
             stmnt.close();
-            closeConnection();
+            closeConnection(connection);
         }
         return monthAppt;
 
@@ -240,7 +253,7 @@ public class AppointmentsTable {
 
         ObservableList<Appointments> weekAppt = FXCollections.observableArrayList();
         Statement stmnt = null;
-        openConnection();
+        Connection connection = openConnection();
 
         String sqlStatement = "SELECT * FROM appointments WHERE start between now() and date_add(now(), interval 1 week);";
         try {
@@ -248,18 +261,18 @@ public class AppointmentsTable {
             ResultSet result = stmnt.executeQuery(sqlStatement);
 
             while (result.next()) {
-                int customerId = result.getInt("customer_Id");
-                int appointmentId = result.getInt("appointment_id");
-                String title = result.getString("title");
-                String description = result.getString("description");
-                String location = result.getString("location");
-                String type = result.getString("type");
-                Timestamp timeStampStart = result.getTimestamp("start");
+                int customerId = result.getInt(CUSTOMER_ID);
+                int appointmentId = result.getInt(APPOINTMENT_ID);
+                String title = result.getString(TITLE);
+                String description = result.getString(DESCRIPTION);
+                String location = result.getString(LOCATION);
+                String type = result.getString(TYPE);
+                Timestamp timeStampStart = result.getTimestamp(START);
                 LocalDateTime start = timeStampStart.toLocalDateTime();
-                Timestamp timeStampEnd = result.getTimestamp("end");
+                Timestamp timeStampEnd = result.getTimestamp(END);
                 LocalDateTime end = timeStampEnd.toLocalDateTime();
-                int userId = result.getInt("user_id");
-                int contactId = result.getInt("contact_Id");
+                int userId = result.getInt(USER_ID);
+                int contactId = result.getInt(CONTACT_ID);
 
 
                 Appointments appt = new Appointments(appointmentId, title, description, location, type, start, end, customerId, userId, contactId);
@@ -271,7 +284,7 @@ public class AppointmentsTable {
             throwables.printStackTrace();
         } finally {
             stmnt.close();
-            closeConnection();
+            closeConnection(connection);
         }
         return weekAppt;
 
@@ -350,11 +363,11 @@ public class AppointmentsTable {
         boolean doesOverlap = false;
 
 
-        for (int i = 0; i < allAppts.size(); i++) {
+        for (Appointments allAppt : allAppts) {
             if (!doesOverlap) {
-                LocalDateTime startOfAppt = allAppts.get(i).getStart();
-                LocalDateTime endOfAppt = allAppts.get(i).getEnd();
-                int apptIdFromTable = allAppts.get(i).getAppointmentId();
+                LocalDateTime startOfAppt = allAppt.getStart();
+                LocalDateTime endOfAppt = allAppt.getEnd();
+                int apptIdFromTable = allAppt.getAppointmentId();
 
                 if (apptId != apptIdFromTable && start.isBefore(startOfAppt) && (end.isBefore(startOfAppt) ||
                         end.isEqual(startOfAppt))) {
@@ -399,11 +412,11 @@ public class AppointmentsTable {
         boolean doesOverlap = false;
 
 
-        for (int i = 0; i < allAppts.size(); i++) {
+        for (Appointments allAppt : allAppts) {
 
             if (!doesOverlap) {
-                LocalDateTime startOfAppt = allAppts.get(i).getStart();
-                LocalDateTime endOfAppt = allAppts.get(i).getEnd();
+                LocalDateTime startOfAppt = allAppt.getStart();
+                LocalDateTime endOfAppt = allAppt.getEnd();
 
                 if (start.isBefore(startOfAppt) && (end.isBefore(startOfAppt) ||
                         end.isEqual(startOfAppt))) {
@@ -455,7 +468,7 @@ public class AppointmentsTable {
                 ", user_id = ?" +
                 " WHERE appointment_Id = ?";
 
-        openConnection();
+        Connection connection = openConnection();
         try {
             PreparedStatement stmnt = connection.prepareStatement(sqlStatement);
             stmnt.setString(1, title);
@@ -475,7 +488,7 @@ public class AppointmentsTable {
             throwables.printStackTrace();
 
         } finally {
-            closeConnection();
+            closeConnection(connection);
         }
     }
 
@@ -501,7 +514,7 @@ public class AppointmentsTable {
                 "(Title,description,location,type,start,end,customer_Id,User_Id,Contact_Id)" +
                 "VALUES (?,?,?,?,?,?,?,?,?)";
 
-        openConnection();
+        Connection connection = openConnection();
         try {
             PreparedStatement stmnt = connection.prepareStatement(sqlStatement);
             stmnt.setString(1, title);
@@ -518,7 +531,7 @@ public class AppointmentsTable {
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-            closeConnection();
+            closeConnection(connection);
         }
 
     }
@@ -533,20 +546,20 @@ public class AppointmentsTable {
 
         String sqlStatement = "select appointment_Id from appointments where customer_id =" + customerId + ";";
         ObservableList<Integer> listofAppt = FXCollections.observableArrayList();
-        openConnection();
+        Connection connection = openConnection();
 
         try {
             Statement stmnt = connection.createStatement();
             ResultSet result = stmnt.executeQuery(sqlStatement);
 
             while (result.next()) {
-                int apptId = result.getInt("appointment_id");
+                int apptId = result.getInt(APPOINTMENT_ID);
                 listofAppt.add(apptId);
 
             }
         } catch (NullPointerException throwable) {
             throwable.printStackTrace();
-            closeConnection();
+            closeConnection(connection);
         }
 
         boolean haveAppt = false;
@@ -557,7 +570,7 @@ public class AppointmentsTable {
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
-            closeConnection();
+            closeConnection(connection);
         }
 
         return haveAppt;
@@ -571,7 +584,7 @@ public class AppointmentsTable {
 
         String sqlStatement = "DELETE FROM appointments WHERE Appointment_ID = ?";
 
-        openConnection();
+        Connection connection = openConnection();
         try {
             PreparedStatement stmnt = connection.prepareStatement(sqlStatement);
             stmnt.setInt(1, apptId);
@@ -581,7 +594,7 @@ public class AppointmentsTable {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-            closeConnection();
+            closeConnection(connection);
         }
 
     }
@@ -624,7 +637,7 @@ public class AppointmentsTable {
         String sqlStatement = "select distinct type from appointments;";
         listOfType.add(0, "All Types");
 
-        openConnection();
+        Connection connection = openConnection();
         try {
             Statement stmnt = connection.createStatement();
             ResultSet result = stmnt.executeQuery(sqlStatement);
@@ -637,7 +650,7 @@ public class AppointmentsTable {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-            closeConnection();
+            closeConnection(connection);
         }
         return listOfType;
 
@@ -661,7 +674,7 @@ public class AppointmentsTable {
         String sqlStatement = "select monthname(start) as Month, count(appointment_ID) as Total_NumberOfAppointment from appointments " + appendedSql + "group by month(start) order by month(start);";
 
 
-        openConnection();
+        Connection connection = openConnection();
         try {
             Statement stmnt = connection.createStatement();
             ResultSet result = stmnt.executeQuery(sqlStatement);
@@ -676,7 +689,7 @@ public class AppointmentsTable {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-            closeConnection();
+            closeConnection(connection);
         }
         return listTotalApptByMonth;
     }
@@ -697,19 +710,19 @@ public class AppointmentsTable {
         String sqlStatement = "select contact_Name, Appointment_ID, title, type , description, start,end,customer_Id from appointments a inner join contacts c on a.contact_id = c.Contact_ID " + appendedSql + " ;";
 
 
-        openConnection();
+        Connection connection = openConnection();
         try {
             Statement stmnt = connection.createStatement();
             ResultSet result = stmnt.executeQuery(sqlStatement);
 
             while (result.next()) {
                 int apptID = result.getInt("Appointment_ID");
-                String title = result.getString("title");
-                String type = result.getString("type");
-                String description = result.getString("description");
-                LocalDateTime start = result.getTimestamp("start").toLocalDateTime();
-                LocalDateTime end = result.getTimestamp("end").toLocalDateTime();
-                int customerId = result.getInt("customer_Id");
+                String title = result.getString(TITLE);
+                String type = result.getString(TYPE);
+                String description = result.getString(DESCRIPTION);
+                LocalDateTime start = result.getTimestamp(START).toLocalDateTime();
+                LocalDateTime end = result.getTimestamp(END).toLocalDateTime();
+                int customerId = result.getInt(CUSTOMER_ID);
 
                 Appointments appt = new Appointments(apptID, title, description, "none", type, start, end, customerId, 1, 1);
                 listAppt.add(appt);
@@ -718,7 +731,7 @@ public class AppointmentsTable {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-            closeConnection();
+            closeConnection(connection);
         }
         return listAppt;
     }
@@ -736,19 +749,19 @@ public class AppointmentsTable {
                 "appointments a inner join users u on a.User_ID = u.User_ID where User_name = '" + username + "' order by a.start";
 
 
-        openConnection();
+        Connection connection = openConnection();
         try {
             Statement stmnt = connection.createStatement();
             ResultSet result = stmnt.executeQuery(sqlStatement);
 
             while (result.next()) {
                 int apptID = result.getInt("Appointment_ID");
-                String title = result.getString("title");
-                String type = result.getString("type");
-                String description = result.getString("description");
-                LocalDateTime start = result.getTimestamp("start").toLocalDateTime();
-                LocalDateTime end = result.getTimestamp("end").toLocalDateTime();
-                int customerId = result.getInt("customer_Id");
+                String title = result.getString(TITLE);
+                String type = result.getString(TYPE);
+                String description = result.getString(DESCRIPTION);
+                LocalDateTime start = result.getTimestamp(START).toLocalDateTime();
+                LocalDateTime end = result.getTimestamp(END).toLocalDateTime();
+                int customerId = result.getInt(CUSTOMER_ID);
 
                 Appointments appt = new Appointments(apptID, title, description, "none", type, start, end, customerId, 1, 1);
                 allAssociatedAppt.add(appt);
@@ -757,7 +770,7 @@ public class AppointmentsTable {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
-            closeConnection();
+            closeConnection(connection);
         }
         return allAssociatedAppt;
 
