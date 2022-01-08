@@ -1,6 +1,0 @@
-
-User t made an unsuccessful login attempt at 2021-11-05 18:26:24.8484496
-User t made an unsuccessful login attempt at 2021-11-05 18:27:06.5732457
-User test successfully logged in at 2021-11-05 18:27:13.6137289
-User test made an unsuccessful login attempt at 2021-11-05 18:48:07.0102057
-User test successfully logged in at 2021-11-06 10:25:06.1761348
