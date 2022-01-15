@@ -4,3 +4,15 @@ User t made an unsuccessful login attempt at 2021-11-05 18:27:06.5732457
 User test successfully logged in at 2021-11-05 18:27:13.6137289
 User test made an unsuccessful login attempt at 2021-11-05 18:48:07.0102057
 User test successfully logged in at 2021-11-06 10:25:06.1761348
+User test successfully logged in at 2022-01-06 17:16:39.1675013
+User test successfully logged in at 2022-01-06 17:22:27.9030796
+User test successfully logged in at 2022-01-06 17:23:37.8112089
+User test successfully logged in at 2022-01-06 17:24:13.8824573
+User test successfully logged in at 2022-01-07 11:18:53.9683348
+User test successfully logged in at 2022-01-07 13:36:21.4379518
+User test successfully logged in at 2022-01-07 18:02:24.5075776
+User gaby successfully logged in at 2022-01-13 16:48:58.4064597
+User test successfully logged in at 2022-01-13 18:11:48.6323503
+java.util.logging.LogRecord@1c610378User t made an unsuccessful login attempt at 2022-01-15 17:12:31.3427463
+User test made an unsuccessful login attempt at 2022-01-15 17:13:06.7628621
+User t made an unsuccessful login attempt at 2022-01-15 17:46:30.0484575

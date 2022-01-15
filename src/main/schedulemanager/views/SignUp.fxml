@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.schedulemanager.controllers.SignUpCntrl">
+   <children>
+      <VBox alignment="CENTER" layoutX="221.0" layoutY="126.0" prefHeight="169.0" prefWidth="175.0">
+         <children>
+            <Label alignment="CENTER" text="Username" />
+            <TextField fx:id="newUsername" />
+            <Label contentDisplay="CENTER" text="Password" />
+            <PasswordField fx:id="newPassword" />
+            <Label text="Confirm Password" />
+            <PasswordField fx:id="confirmPassword" />
+         </children>
+      </VBox>
+      <Label layoutX="283.0" layoutY="80.0" text="New User" />
+      <Button fx:id="submitBtn" layoutX="283.0" layoutY="296.0" mnemonicParsing="false" onAction="#addNewUser" text="Submit" />
+      <Button fx:id="CancelBtn" layoutX="520.0" layoutY="14.0" mnemonicParsing="false" onAction="#returnToLogin" text="Cancel" />
+   </children>
+</AnchorPane>

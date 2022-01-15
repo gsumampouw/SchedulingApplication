@@ -38,7 +38,7 @@ public class AppointmentDao {
         ObservableList<Appointments> allAssociatedAppt = FXCollections.observableArrayList();
         Connection connection = openConnection();
 
-        Statement stmnt;
+        Statement stmnt = null;
         String sqlStatement = SELECT_FROM_APPOINTMENTS_WHERE_CUSTOMER_ID + customerId + ";";
         try {
             stmnt = connection.createStatement();
@@ -64,6 +64,7 @@ public class AppointmentDao {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
+            stmnt.close();
             closeConnection(connection);
         }
         return allAssociatedAppt;

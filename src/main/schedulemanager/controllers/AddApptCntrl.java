@@ -26,11 +26,21 @@ import java.util.ResourceBundle;
 
 public class AddApptCntrl implements Initializable {
 
-    JavaFXFunctions navigation = new JavaFXFunctions();
-    JavaFXFunctions alertInfoBox = new JavaFXFunctions();
-    AppointmentDao appointmentDao = new AppointmentDao();
-    ContactDao contactDao = new ContactDao();
-    UserDao userDao = new UserDao();
+    JavaFXFunctions navigation ;
+    JavaFXFunctions alertInfoBox ;
+    AppointmentDao appointmentDao;
+    ContactDao contactDao ;
+    UserDao userDao ;
+    Checks check ;
+
+    private AddApptCntrl() {
+         navigation = new JavaFXFunctions();
+         alertInfoBox = new JavaFXFunctions();
+         appointmentDao = new AppointmentDao();
+         contactDao = new ContactDao();
+         userDao = new UserDao();
+         check = new Checks();
+    }
 
     @FXML
     private TextField appointmentIdText;
@@ -173,7 +183,8 @@ public class AddApptCntrl implements Initializable {
     }
 
     /**
-     * Initializes add appointment page. It autopopulates the customerId and tableviews. It also populates the comboboxes.
+     * Initializes add appointment page. It autopopulates the customerId and tableviews. It also populates the
+     * comboboxes.
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -277,17 +288,18 @@ public class AddApptCntrl implements Initializable {
      */
     @FXML
     public void logout(ActionEvent event) throws IOException {
-         navigation.navigateToPage(event, "/main/schedulemanager/views/Login.fxml");
+        navigation.navigateToPage(event, "/main/schedulemanager/views/Login.fxml");
     }
 
     /**
-     * Adds new appointment to database if the appointment start and end is within office hours and does not overlap with other appointments.
+     * Adds new appointment to database if the appointment start and end is within office hours and does not
+     * overlap with other appointments.
+     *
      * @param event This event is triggered when the save button is clicked.
      * @throws IOException
      */
     @FXML
     public void saveButton(ActionEvent event) throws IOException {
-
 
         String title = titleText.getText();
         String description = descriptionText.getText();
@@ -305,23 +317,26 @@ public class AddApptCntrl implements Initializable {
 
         LocalDateTime start = LocalDateTime.of(startDate, startTime);
         LocalDateTime end = LocalDateTime.of(endDate, endTime);
-        Checks check = new Checks();
         boolean inOfficeHours = check.checkIfTimeIsInOfficeHrs(start, end);
         boolean overlapsWithOtherAppts = check.checkIfNewApptOverlapsWithOtherAppts(start, end);
 
         if (end.isBefore(start)) {
             String textmsg = "End time is before start time";
-            alertInfoBox.informationAlert("Alert!",null,textmsg);
+            alertInfoBox.informationAlert("Alert!", null, textmsg);
 
         } else if (inOfficeHours && !overlapsWithOtherAppts) {
-           appointmentDao.addAppointment(title, description, location, type, start, end, customerId, userId, contactId);
+            appointmentDao
+                    .addAppointment(title, description, location, type, start, end, customerId,
+                            userId, contactId);
             navigation.navigateToPage(event, "/main/schedulemanager/views/UpdateCustomer.fxml");
 
         } else if (!inOfficeHours) {
-            alertInfoBox.informationAlert("Appointment is not in office hours",null,"Appointment is not in office hours. Pick a different time.");
+            alertInfoBox.informationAlert("Appointment is not in office hours", null,
+                    "Appointment is not in office hours. Pick a different time.");
 
         } else {
-            alertInfoBox.informationAlert("Appointment overlaps with another appointment",null,"Appointment overlaps with another appointment. Pick a different time.");
+            alertInfoBox.informationAlert("Appointment overlaps with another appointment", null,
+                    "Appointment overlaps with another appointment. Pick a different time.");
         }
 
     }

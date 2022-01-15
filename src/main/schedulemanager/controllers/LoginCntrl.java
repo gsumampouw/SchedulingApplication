@@ -12,6 +12,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import main.schedulemanager.services.Display;
 import main.schedulemanager.services.JavaFXFunctions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,7 +22,9 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
+import java.util.logging.*;
 
 
 public class LoginCntrl implements Initializable {
@@ -27,6 +32,7 @@ public class LoginCntrl implements Initializable {
     JavaFXFunctions navigation = new JavaFXFunctions();
     JavaFXFunctions alertInfoBox = new JavaFXFunctions();
     UserDao userDao = new UserDao();
+    Logger logger = LogManager.getLogger(LoginCntrl.class);
 
     @FXML
     private TextField usernameText;
@@ -63,7 +69,6 @@ public class LoginCntrl implements Initializable {
         ZoneId systemId = (ZoneId.systemDefault());
         userLocation = systemId.toString();
         userLanguage = System.getProperty("user.language");
-
         zoneIDLabel.setText("User Location: " + userLocation);
 
         try {
@@ -75,6 +80,7 @@ public class LoginCntrl implements Initializable {
             }
         } catch (Exception e) {
             e.printStackTrace();
+
         }
     }
 
@@ -87,9 +93,12 @@ public class LoginCntrl implements Initializable {
      * @throws SQLException
      */
     @FXML
-    public void login(ActionEvent event) throws IOException, SQLException {
+    public void login(ActionEvent event) throws IOException {
         String username = usernameText.getText();
         String password = passwordText.getText();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Checking login info for user");
+        }
         Users databaseUser = null;
 
         information_dialog = "Information Dialog";
@@ -97,10 +106,10 @@ public class LoginCntrl implements Initializable {
             databaseUser = userDao.getUsersByUserName(username);
             logedinUsername = databaseUser.getUsername();
             logedinUserID = databaseUser.getUserId();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Error occured for user " +  databaseUser.getUserId() + "during login",e);
         } catch (NullPointerException e){
-            e.printStackTrace();
+            logger.warn("user used wrong username or password", e);
             if (userLanguage.equals("fr")) {
                 alertInfoBox.informationAlert(information_dialog,"Nom d'utilisateur ou mot de passe incorrect!",null );
             } else {
@@ -111,13 +120,14 @@ public class LoginCntrl implements Initializable {
 
         loginTime = LocalDateTime.now();
         Timestamp time = Timestamp.valueOf(loginTime);
-        String filename = "log\\login_activity.txt";
         String item = "User " + username + " made an unsuccessful login attempt at " +time+ "\n";
 
         if (databaseUser != null && databaseUser.getPassword().equals(password)) {
 
             item = "User " + logedinUsername + " successfully logged in at "  + time+"\n";
-            navigation.navigateToPage(event, "/main/schedulemanager/views/Home.fxml");
+
+                navigation.navigateToPage(event, "/main/schedulemanager/views/Home.fxml");
+
             Display display = new Display();
             ObservableList<Appointments> listofApptIn15 = display.listApptIn15MinSinceLogIn(LoginCntrl.loginTime);
 
@@ -137,9 +147,14 @@ public class LoginCntrl implements Initializable {
                 alertInfoBox.informationAlert(information_dialog,null,alertMessage);
             }
         }
+        String filename = "log\\login_activity.txt";
         FileWriter fwriter = new FileWriter(filename, true);
         PrintWriter outputFile = new PrintWriter(fwriter);
         outputFile.print(item);
         outputFile.close();
+    }
+
+    public void navigateToSignUp(ActionEvent mouseEvent) throws IOException {
+        navigation.navigateToPage(mouseEvent,"/main/schedulemanager/views/SignUp.fxml");
     }
 }

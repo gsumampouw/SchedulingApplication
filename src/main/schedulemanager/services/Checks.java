@@ -16,11 +16,26 @@ import static main.schedulemanager.database.JDBC.openConnection;
 
 public class Checks {
 
+    private ZonedDateTime officeZonedStartTime;
+    private ZonedDateTime officeZonedEndTime;
+
     public Checks() {
     }
 
+    private void initializeOfficeStartEndTime(LocalDateTime start) {
+        if (officeZonedStartTime == null || officeZonedEndTime == null) {
+            ZoneId estZoneID = ZoneId.of("US/Eastern");
+            LocalDate startDate = start.toLocalDate();
+            LocalTime officeStartTime = LocalTime.of(8, 0);
+            LocalTime officeEndTime = LocalTime.of(22, 0);
+            officeZonedStartTime = ZonedDateTime.of(startDate, officeStartTime, estZoneID);
+            officeZonedEndTime = ZonedDateTime.of(startDate, officeEndTime, estZoneID);
+        }
+    }
+
     /**
-     * Checks if start and end time is with in EST business hours of 8AM to 10PM.  Appointments must be in the same day to be true.
+     * Checks if start and end time is with in EST business hours of 8AM to 10PM.  Appointments must be in the
+     * same day to be true.
      *
      * @param start Start time of appointment.
      * @param end   End time of appointment.
@@ -28,23 +43,16 @@ public class Checks {
      */
     // TODO In general, business logic should not be in DAO or Controller class, but in Service package classes
     // TODO: Read about why to avoid using Static most of the time
-    public static boolean checkIfTimeIsInOfficeHrs(LocalDateTime start, LocalDateTime end) {
+    public boolean checkIfTimeIsInOfficeHrs(LocalDateTime start, LocalDateTime end) {
 
-        ZoneId estZoneID = ZoneId.of("US/Eastern");
         ZoneId localZoneID = ZoneId.systemDefault();
         ZonedDateTime startLocalTime = start.atZone(localZoneID);
         ZonedDateTime endLocalTime = end.atZone(localZoneID);
 
+        this.initializeOfficeStartEndTime(start);
 
-        LocalDate startDate = start.toLocalDate();
-        LocalTime officeStartTime = LocalTime.of(8, 0);
-        LocalTime officeEndTime = LocalTime.of(22, 0);
-        ZonedDateTime officeZonedStartTime = ZonedDateTime.of(startDate, officeStartTime, estZoneID);
-
-        ZonedDateTime officeZonedEndTime = ZonedDateTime.of(startDate, officeEndTime, estZoneID);
-
-
-        if (startLocalTime.isBefore(officeZonedStartTime) || startLocalTime.isAfter(officeZonedEndTime) || endLocalTime.isAfter(officeZonedEndTime)) {
+        if (startLocalTime.isBefore(officeZonedStartTime) || startLocalTime
+                .isAfter(officeZonedEndTime) || endLocalTime.isAfter(officeZonedEndTime)) {
             return false;
         } else {
             return true;
@@ -58,10 +66,12 @@ public class Checks {
      * @param start  Start time of appointment.
      * @param end    End time of appointment.
      * @param apptId Appointment ID of selected appointment.
-     * @return Returns true if the start or end time of the appointment overlaps another appointment, and returns false if it does not.
+     * @return Returns true if the start or end time of the appointment overlaps another appointment, and
+     * returns false if it does not.
      */
     // TODO In general, business logic should not be in DAO or Controller class, but in Service package classes
-    public static boolean checkIfUpdatedApptOverlapsWithOtherAppts(LocalDateTime start, LocalDateTime end, int apptId) {
+    public static boolean checkIfUpdatedApptOverlapsWithOtherAppts(LocalDateTime start, LocalDateTime end,
+                                                                   int apptId) {
         /*query all appts and store appointments into an array. create for loop that check each start and end date.
         if boolean check value is false.
         it is not the current appointment id.
@@ -91,7 +101,8 @@ public class Checks {
                         end.isEqual(startOfAppt))) {
                     doesOverlap = false;
 
-                } else if (apptId != apptIdFromTable && (start.isAfter(endOfAppt) || start.isEqual(endOfAppt))) {
+                } else if (apptId != apptIdFromTable && (start.isAfter(endOfAppt) || start
+                        .isEqual(endOfAppt))) {
                     doesOverlap = false;
                 } else if (apptId == apptIdFromTable) {
                     doesOverlap = false;
@@ -113,8 +124,7 @@ public class Checks {
      * @param end   End time of new appointment.
      * @return Returns true if the appointment time overlaps and false if it does not.
      */
-    // TODO In general, business logic should not be in DAO or Controller class, but in Service package classes
-    public static boolean checkIfNewApptOverlapsWithOtherAppts(LocalDateTime start, LocalDateTime end) {
+    public boolean checkIfNewApptOverlapsWithOtherAppts(LocalDateTime start, LocalDateTime end) {
         /*query all appts and store appointments into an array. create for loop that check each start and end date.
         if boolean check value is false.
           the currentstart  is after the existing end OR
@@ -125,13 +135,12 @@ public class Checks {
         ObservableList<Appointments> allAppts = null;
         try {
             AppointmentDao appointmentDao = new AppointmentDao();
-            allAppts =  appointmentDao.getAllAppt();
+            allAppts = appointmentDao.getAllAppt();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
 
         boolean doesOverlap = false;
-
 
         for (Appointments allAppt : allAppts) {
 
@@ -148,11 +157,8 @@ public class Checks {
                 } else {
                     doesOverlap = true;
                 }
-
-
             }
         }
-
         return doesOverlap;
 
     }
@@ -196,7 +202,6 @@ public class Checks {
             e.printStackTrace();
             closeConnection(connection);
         }
-
         return haveAppt;
     }
 

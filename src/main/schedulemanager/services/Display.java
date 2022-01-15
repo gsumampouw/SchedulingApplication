@@ -10,10 +10,12 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class Display {
+    AppointmentDao appointmentDao = new AppointmentDao();
     public Display() {
     }
+
     /**
-     * Creates a list of appointments with in the next 15 minutes of the user login time.
+     * Creates a list of appointments within the next 15 minutes of the user login time.
      *
      * @param loginTime Time the user successfully logs in.
      * @return Returns an observable list of appointments.
@@ -22,7 +24,7 @@ public class Display {
     public ObservableList<Appointments> listApptIn15MinSinceLogIn(LocalDateTime loginTime) {
         ObservableList<Appointments> listApptIn15 = FXCollections.observableArrayList();
         try {
-            AppointmentDao appointmentDao = new AppointmentDao();
+
             ObservableList<Appointments> listofAppt = appointmentDao.getAllAppt();
 
             for (Appointments appointments : listofAppt) {
@@ -30,7 +32,8 @@ public class Display {
                 LocalDateTime loginTimePlus15 = loginTime.plusMinutes(15);
 
 
-                if (apptStartTime.isEqual(loginTime) || (apptStartTime.isAfter(loginTime) && apptStartTime.isBefore(loginTimePlus15))) {
+                if (apptStartTime.isEqual(loginTime) || (apptStartTime.isAfter(loginTime) && apptStartTime
+                        .isBefore(loginTimePlus15))) {
                     listApptIn15.add(appointments);
                 }
 
@@ -50,8 +53,9 @@ public class Display {
      */
     public static final ObservableList<LocalTime> listOfTime() {
 
-        // TODO: Make this list a global static (maybe final as well if possible) that only gets initialized once
-        // TODO: Move the global variable and this method to a more general location, such as a Util class
+        // TODO: Make this list a public static (maybe final as well if possible) that only gets initialized
+        //  once
+        // TODO: Move the public variable and this method to a more general location, such as a Util class
         ObservableList<LocalTime> localTimes = FXCollections.observableArrayList();
         LocalTime time = LocalTime.of(0, 0);
 

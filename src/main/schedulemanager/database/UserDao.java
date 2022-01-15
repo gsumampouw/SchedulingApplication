@@ -5,10 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 import static main.schedulemanager.database.JDBC.*;
 
@@ -45,8 +42,8 @@ public class UserDao {
                 databaseUser = new Users(userId, username, password);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        }finally {
+            throw e;
+        } finally {
             closeConnection(connection);
         }
         return databaseUser;
@@ -114,5 +111,27 @@ public class UserDao {
         return allUserIds;
     }
 
+    /**
+     * Creates new user in database
+     * @param username new username
+     * @param password new password
+     */
+    public void addNewUser(String username, String password){
+        String sqlStatement =  "INSERT INTO users " +
+                "(user_name,password)" +
+                "VALUES (?,?)";
 
-}
+        Connection connection = openConnection();
+        try {
+            PreparedStatement stmnt = connection.prepareStatement(sqlStatement);
+            stmnt.setString(1, username);
+            stmnt.setString(2, password);
+            stmnt.executeUpdate();
+
+    } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }finally {
+            closeConnection(connection);
+        }
+        }
+    }
