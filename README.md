@@ -4,18 +4,20 @@
 * [How to run](#how-to-run)
 
 ## General info
-Title: Desktop Scheduling Application
-Purpose: To create a GUI based scheduling desktop application.
-Author: Gaby Sumampouw
-Contact Info: Email - gsumampo@wgu.edu
-Date: 01/13/2022
+* Title: Desktop Scheduling Application
+* Purpose: To create a GUI based scheduling desktop application.
+* Author: Gaby Sumampouw
+* Contact Info: Email - gsumampo@wgu.edu
+* Date: 01/13/2022
 
 ## Technologies
 * IDE: IntelliJ Community 2021.1.3
 * JDK: JDK 11
 * JAVAFX:javafx-sdk-11.0.2
 * MySQL: mysql-connector-java-8.0.26
-* junit-jupiter-5.8.2
+* JUnit-jupiter-5.8.2
+* Mockito
+* Log4J 2
 
 ## How to run
 Install JDK11, javafx-sdk-11.0.2, IntelliJ Community 2021.1.3 and mysql-connector-java-8.0.26. If you start the application, you will see the login page. 
