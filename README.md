@@ -7,8 +7,8 @@
 * Title: Desktop Scheduling Application
 * Purpose: To create a GUI based scheduling desktop application.
 * Author: Gaby Sumampouw
-* Contact Info: Email - gsumampo@wgu.edu
-* Date: 01/13/2022
+* Contact Info: Email - gsumampouw8@gmail.com
+* Date: 01/19/2022
 
 ## Technologies
 * IDE: IntelliJ Community 2021.1.3
