@@ -3,21 +3,22 @@
 * [Technologies](#technologies)
 * [How to run](#how-to-run)
 
-##General info
+## General info
 Title: Desktop Scheduling Application
 Purpose: To create a GUI based scheduling desktop application.
 Author: Gaby Sumampouw
 Contact Info: Email - gsumampo@wgu.edu
 Date: 01/13/2022
 
-##Technologies
-IDE: IntelliJ Community 2021.1.3
-JDK: JDK 11
-JAVAFX:javafx-sdk-11.0.2
-MySQL: mysql-connector-java-8.0.26
-junit-jupiter-5.8.2
+## Technologies
+* IDE: IntelliJ Community 2021.1.3
+* JDK: JDK 11
+* JAVAFX:javafx-sdk-11.0.2
+* MySQL: mysql-connector-java-8.0.26
+* junit-jupiter-5.8.2
 
-How to run: Install JDK11, javafx-sdk-11.0.2, IntelliJ Community 2021.1.3 and mysql-connector-java-8.0.26. If you start the application, you will see the login page. 
+## How to run
+Install JDK11, javafx-sdk-11.0.2, IntelliJ Community 2021.1.3 and mysql-connector-java-8.0.26. If you start the application, you will see the login page. 
 To create a new user, click the "New User" button in the top right corner. Login with the new user credentials to go to the home page. The application logs user login attempts to a login_activity.txt file and alert the user if an appointment is starting within 15 minutes of login. 
 The home page shows all customers in the database.
 From the home page you can add, update or delete a customer. You must update a customer in order to add, update or delete an appointment. Appointments are shown according to user local time. 
